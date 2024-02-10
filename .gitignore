@@ -2,3 +2,7 @@ daksh/
 .venv
 .vscode
 *.out
+.cache
+debug
+main
+\#*\#

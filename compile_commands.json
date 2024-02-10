@@ -1,0 +1,30 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-I",
+      "include/",
+      "-o",
+      "main",
+      "src/my_utils.cpp"
+    ],
+    "directory": "/home/cosmic/coding/cop290/as1/sb3",
+    "file": "/home/cosmic/coding/cop290/as1/sb3/src/my_utils.cpp",
+    "output": "/home/cosmic/coding/cop290/as1/sb3/main"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-I",
+      "include/",
+      "-o",
+      "main",
+      "src/parser.cpp"
+    ],
+    "directory": "/home/cosmic/coding/cop290/as1/sb3",
+    "file": "/home/cosmic/coding/cop290/as1/sb3/src/parser.cpp",
+    "output": "/home/cosmic/coding/cop290/as1/sb3/main"
+  }
+]
