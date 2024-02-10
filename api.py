@@ -10,10 +10,12 @@ def get_past_n_days(symbol: str, start_date: date, n: int) -> pd.DataFrame:
     """Gets data for the past n business days"""
     df = pd.DataFrame()
     # We subtract one extra day from both because query_exchange is inclusive
-    while df.size < n:
-        n += 1
+    cur = n
+    while df.shape[0] < n:
+        print(cur)
+        cur += 1
         df = query_exchange(
-            symbol, start_date - relativedelta(days=n), start_date - relativedelta(1)
+            symbol, start_date - relativedelta(days=cur), start_date - relativedelta(days=1)
         )
 
     return df
@@ -54,5 +56,5 @@ if __name__ == "__main__":
 
     else:
         # For any other strategy
-        n = sys.argv[4]
+        n = int(sys.argv[4])
         write_close_price(get_data(symbol, start_date, end_date, n))
