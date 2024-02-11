@@ -187,7 +187,7 @@ class LinearRegression : public Strategy
                 {
                     cash_transaction = cash_transaction - close_price[i];
                     position++;
-                    cashflow.push_back(std::make_pair(date[i], cash_transaction));
+                    
                     std::vector<std::string> v = {date[i], "BUY", "1", std::to_string(close_price[i])};
                     order_stats.push_back(v);
                 }
@@ -198,11 +198,12 @@ class LinearRegression : public Strategy
                 {
                     cash_transaction = cash_transaction + close_price[i];
                     position--;
-                    cashflow.push_back(std::make_pair(date[i], cash_transaction));
+                    
                     std::vector<std::string> v = {date[i], "SELL", "1", std::to_string(close_price[i])};
                     order_stats.push_back(v);
                 }
             }
+            cashflow.push_back(std::make_pair(date[i], cash_transaction));
         }
 
         total_profit = cash_transaction + (position * close_price.back());
