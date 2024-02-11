@@ -56,7 +56,8 @@ class MatrixUtil
         {
             throw std::runtime_error("inverse of a non square matrix");
         }
-        std::vector<std::vector<double>> result = std::vector(matc.size(), std::vector<double>(matc.size()));
+        std::vector<std::vector<double>> result =
+            std::vector<std::vector<double>>(matc.size(), std::vector<double>(matc.size()));
         for (int i = 0; i < matc.size(); i++)
         {
             result[i][i] = 1.0;
