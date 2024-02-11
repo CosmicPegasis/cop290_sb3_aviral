@@ -65,6 +65,7 @@ class CSVParser
         }
 
         this->parse_result = this->parse(file);
+        file.close();
     }
     std::vector<std::string> get_column(int column_num)
     {
