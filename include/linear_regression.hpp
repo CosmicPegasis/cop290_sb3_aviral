@@ -85,6 +85,8 @@ struct Dataset
 };
 class LinearRegression : public Strategy
 {
+    int x, p;
+    std::string symbol, train_start, train_end, start, end;
     LinearRegressionCore core;
     static std::vector<std::vector<double>> get_transformed(const std::vector<std::vector<double>> &x)
     {
@@ -97,24 +99,42 @@ class LinearRegression : public Strategy
         return x_with_constant_term;
     }
 
-    static Dataset get_training_data(std::string symbol, std::string train_start, std::string train_end)
+    // TODO Add destructor
+    void query_exchange()
     {
-        system("echo hello world");
-        return Dataset{};
+        std::string command = "python3 api.py LINEAR_REGRESSION " + symbol + " " + train_start + " " + train_end + " " +
+                              start + " " + end + " regression";
+        system(command.c_str());
+    }
+    static Dataset get_data(std::string filename)
+    {
+        CSVParser csv(filename);
+        Dataset result;
+        result.dates = csv.get_column(0);
+        std::vector<std::vector<std::string>> csv_in_params;
+        result.in_params = std::vector<std::vector<double>>(result.dates.size(), std::vector<double>(7, 0));
+        for (int j = 2; j < 9; j++)
+        {
+            std::vector<std::string> csv_column = csv.get_column(j);
+            for (int i = 0; i < csv_column.size(); i++)
+            {
+                result.in_params[i][j - 2] = stod(csv_column[i]);
+            }
+        }
+        std::vector<std::string> csv_close_price = csv.get_column(1);
+        for (auto &elem : csv_close_price)
+        {
+            result.close_price.push_back(stod(elem));
+        }
+        return result;
     };
 
-    static Dataset get_trade_data(std::string symbol, std::string start, std::string end)
-    {
-        return Dataset{};
-    };
     void initialise_core(const std::vector<std::vector<double>> &x, const std::vector<double> &y)
     {
 
         std::vector<std::vector<double>> x_with_constant_term = get_transformed(x);
-        print(x_with_constant_term);
         this->core = std::move(LinearRegressionCore{x_with_constant_term, y});
     }
-
     double predict(std::vector<double> x)
     {
         x.push_back(1);
@@ -129,21 +149,40 @@ class LinearRegression : public Strategy
         }
         return result;
     }
-    Statistics get_stats(std::vector<double> predicted_prices, std::vector<double> close_prices, int p, int x){};
+    Statistics get_stats(std::vector<double> predicted_prices, std::vector<double> close_prices, int p, int x)
+    {
+        return Statistics{};
+    };
+    void parse_args(std::vector<std::string> args)
+    {
+        // LinearRegression(std::string symbol, int x, int p, std::string train_start, std::string train_end,
+        //                  std::string start, std::string end)
+        if (args.size() < 7)
+        {
+            throw std::runtime_error("Illformed argument list");
+        }
+        this->symbol = args[0];
+        this->x = stoi(args[1]);
+        this->p = stoi(args[2]);
+        this->train_start = args[3];
+        this->train_end = args[4];
+        this->start = args[5];
+        this->end = args[6];
+    }
 
   public:
     LinearRegression(const std::vector<std::vector<double>> &x, const std::vector<double> &y)
     {
         this->initialise_core(x, y);
     }
-    LinearRegression(std::string symbol, int x, int p, std::string train_start, std::string train_end,
-                     std::string start, std::string end)
+    LinearRegression(std::vector<std::string> args)
     {
-        Dataset training_data = this->get_training_data(symbol, train_start, train_end);
+        this->parse_args(args);
+        this->query_exchange();
+        Dataset training_data = this->get_data("train_regression.csv");
         this->initialise_core(training_data.in_params, training_data.close_price);
-
-        Dataset trade_data = this->get_trade_data(symbol, start, end);
+        Dataset trade_data = this->get_data("trade_regression.csv");
         std::vector<double> predicted_prices = this->get_predictions(trade_data.in_params);
-        this->stats = get_stats(predicted_prices, trade_data.close_price, p, x);
+        this->stats = get_stats(predicted_prices, trade_data.close_price, this->p, this->x);
     }
 };
