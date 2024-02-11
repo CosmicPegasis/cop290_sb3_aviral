@@ -6,9 +6,10 @@
 #include <string>
 #include <vector>
 
+#pragma once
 class CSVParser
 {
-public:
+  public:
     std::vector<std::string> parse_line(std::string line)
     {
         std::vector<std::string> result;
@@ -53,7 +54,7 @@ public:
 
     std::vector<std::vector<std::string>> parse_result;
 
-public:
+  public:
     CSVParser(std::string filename)
     {
         std::ifstream file;
@@ -91,7 +92,7 @@ class ClosePriceParser : CSVParser
     std::vector<double> close_price;
     std::vector<std::string> dates;
 
-public:
+  public:
     ClosePriceParser(std::string filename) : CSVParser{filename}
     {
         this->dates = this->get_column(0);
