@@ -187,7 +187,7 @@ class LinearRegression : public Strategy
                 {
                     cash_transaction = cash_transaction - close_price[i];
                     position++;
-                    
+
                     std::vector<std::string> v = {date[i], "BUY", "1", std::to_string(close_price[i])};
                     order_stats.push_back(v);
                 }
@@ -198,7 +198,7 @@ class LinearRegression : public Strategy
                 {
                     cash_transaction = cash_transaction + close_price[i];
                     position--;
-                    
+
                     std::vector<std::string> v = {date[i], "SELL", "1", std::to_string(close_price[i])};
                     order_stats.push_back(v);
                 }
@@ -224,6 +224,18 @@ class LinearRegression : public Strategy
     {
         this->parse_args(args);
         this->query_exchange();
+        Dataset training_data = this->get_data("train_regression.csv");
+        this->initialise_core(training_data.in_params, training_data.close_price);
+        Dataset trade_data = this->get_data("trade_regression.csv");
+        std::vector<double> predicted_prices = this->get_predictions(trade_data.in_params);
+        this->stats = get_stats(predicted_prices, trade_data.close_price, trade_data.dates);
+    }
+    LinearRegression(std::string symbol, int x, int p, std::string start, std::string end)
+        : symbol{symbol}, x{x}, p{p}, start{start}, end{end}
+    {
+        std::string command =
+            "python3 api.py LINEAR_REGRESSION_SPECIAL " + symbol + " " + start + " " + end + " regression";
+        system(command.c_str());
         Dataset training_data = this->get_data("train_regression.csv");
         this->initialise_core(training_data.in_params, training_data.close_price);
         Dataset trade_data = this->get_data("trade_regression.csv");
