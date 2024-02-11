@@ -170,6 +170,50 @@ class LinearRegression : public Strategy
         this->end = args[6];
     }
 
+    Statistics get_stats(std::vector<double> &predicted_prices, std::vector<double> &close_price,
+                         std::vector<std::string> &date)
+    {
+        std::vector<std::pair<std::string, double>> cashflow;
+        std::vector<std::vector<std::string>> order_stats;
+        double total_profit = 0;
+        int position = 0;
+        double cash_transaction = 0;
+
+        for (int i = 0; i < predicted_prices.size(); i++)
+        {
+            if (predicted_prices[i] > close_price[i] + ((double(p) * close_price[i]) / 100))
+            {
+                if (position < x)
+                {
+                    cash_transaction = cash_transaction - close_price[i];
+                    position++;
+                    cashflow.push_back(std::make_pair(date[i], cash_transaction));
+                    std::vector<std::string> v = {date[i], "BUY", "1", std::to_string(close_price[i])};
+                    order_stats.push_back(v);
+                }
+            }
+            else if (predicted_prices[i] < close_price[i] - ((double(p) * close_price[i]) / 100))
+            {
+                if (position > -x)
+                {
+                    cash_transaction = cash_transaction + close_price[i];
+                    position--;
+                    cashflow.push_back(std::make_pair(date[i], cash_transaction));
+                    std::vector<std::string> v = {date[i], "SELL", "1", std::to_string(close_price[i])};
+                    order_stats.push_back(v);
+                }
+            }
+        }
+
+        total_profit = cash_transaction + (position * close_price.back());
+
+        Statistics ans;
+        ans.daily_cashflow = cashflow;
+        ans.final_pnl = total_profit;
+        ans.order_statistics = order_stats;
+        return ans;
+    }
+
   public:
     LinearRegression(const std::vector<std::vector<double>> &x, const std::vector<double> &y)
     {
@@ -183,6 +227,11 @@ class LinearRegression : public Strategy
         this->initialise_core(training_data.in_params, training_data.close_price);
         Dataset trade_data = this->get_data("trade_regression.csv");
         std::vector<double> predicted_prices = this->get_predictions(trade_data.in_params);
-        this->stats = get_stats(predicted_prices, trade_data.close_price, this->p, this->x);
+        this->stats = get_stats(predicted_prices, trade_data.close_price, trade_data.dates);
+    }
+    ~LinearRegression()
+    {
+        remove("trade_regression.csv");
+        remove("train_regression.csv");
     }
 };
