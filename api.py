@@ -56,7 +56,9 @@ def process_regression_date(dataframe):
     return dataframe
 
 
-def write_dataframe(df, file_name):
+def write_dataframe(df, file_name, invert=True):
+    if invert:
+        df = df.iloc[::-1]
     df.to_csv(f"{file_name}", index=False, header=False, date_format="%d/%m/%Y")
 
 
@@ -72,22 +74,31 @@ def create_linear_regression_data(
     train_df = get_data(symbol, train_start_date, train_end_date, 1)
     train_df = process_regression_date(train_df)
     # train_df.to_csv(f"train_{file_name}.csv", index=False, header=False)
-    write_dataframe(train_df, f"train_{file_name}.csv")
+    write_dataframe(train_df, f"train_{file_name}.csv", invert=False)
 
     trade_df = get_data(symbol, start_date, end_date, 1)
     trade_df = process_regression_date(trade_df)
     # trade_df.to_csv(f"trade_{file_name}.csv", index=False, header=False)
-    write_dataframe(trade_df, f"trade_{file_name}.csv")
+    write_dataframe(trade_df, f"trade_{file_name}.csv", invert=False)
     # close, open, vwap, low, high, no of trades, open(cur)
     # write train_df as it is for testing purposes
     # predict_df = get_data(symbol, start_date, end_date, 1)
     return
 
 
+def create_basic_data(symbol, n, start, end, file_name):
+    start = date_parser.parse(start, dayfirst=True)
+    end = date_parser.parse(end, dayfirst=True)
+    n = int(n)
+    df = get_data(symbol, start, end, n)
+    write_dataframe(df[["DATE", "CLOSE"]], file_name)
+
+
 if __name__ == "__main__":
     strategy = sys.argv[1]
     if strategy == "BASIC":
-        exit()
+        [symbol, n, start, end, file_name] = sys.argv[2:]
+        create_basic_data(symbol, n, start, end, file_name)
     elif strategy == "DMA":
         exit()
     elif strategy == "DMA++":
