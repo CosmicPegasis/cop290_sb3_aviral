@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#pragma once
 
 enum StrategyType
 {
@@ -13,11 +14,28 @@ enum StrategyType
     BestOfAllStrat,
     PairsStrat,
 };
+struct Statistics
+{
+    std::vector<std::pair<std::string, double>> daily_cashflow;
+    std::vector<std::pair<std::string, double>> order_statistics;
+    double final_pnl;
+};
 class Strategy
 {
-    // double get_final_pnl();
-    // std::vector<double> get_daily_cashflow();
-    // std::vector<OrderStatistic> get_order_statistics();
+  public:
+    Statistics stats;
+    double get_final_pnl()
+    {
+        return stats.final_pnl;
+    }
+    std::vector<std::pair<std::string, double>> get_daily_cashflow()
+    {
+        return stats.daily_cashflow;
+    };
+    std::vector<std::pair<std::string, double>> get_order_statistics()
+    {
+        return stats.order_statistics;
+    };
 };
 
 class Basic : public Strategy
@@ -55,11 +73,11 @@ class ADX : public Strategy
   public:
     ADX(std::vector<std::string> args){};
 };
-class LinearRegression : public Strategy
-{
-  public:
-    LinearRegression(std::vector<std::string> args){};
-};
+// class LinearRegression : public Strategy
+// {
+//   public:
+//     LinearRegression(std::vector<std::string> args){};
+// };
 
 class BestOfAll : public Strategy
 {
