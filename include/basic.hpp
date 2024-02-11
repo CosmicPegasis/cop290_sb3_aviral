@@ -2,19 +2,19 @@
 #include <iostream>
 #include <stdexcept>
 #include <strategy.hpp>
+#pragma once
 using namespace std;
-
 class Basic : public Strategy
 {
     int n, x;
-    string symbol, start, end;
-    vector<string> dates;
-    vector<double> close_prices;
-    void parse_args(vector<string> &args)
+    std::string symbol, start, end;
+    std::vector<std::string> dates;
+    std::vector<double> close_prices;
+    void parse_args(std::vector<std::string> &args)
     {
         if (args.size() < 5)
         {
-            throw runtime_error("Illformed args");
+            throw std::runtime_error("Illformed args");
         }
         symbol = args[0];
         n = stoi(args[1]);
@@ -25,13 +25,15 @@ class Basic : public Strategy
 
     void get_data()
     {
-        string command = "python3 api.py BASIC " + symbol + " " + to_string(n) + " " + start + " " + end + " basic.csv";
+        std::string command =
+            "python3 api.py BASIC " + symbol + " " + std::to_string(n) + " " + start + " " + end + " basic.csv";
         system(command.c_str());
         ClosePriceParser csv("basic.csv");
         this->dates = csv.get_dates();
         this->close_prices = csv.get_close_price();
     }
-    Statistics get_stats(vector<vector<double>> close_price, vector<string> dates)
+
+    Statistics get_stats(vector<vector<double>> data, vector<string> date)
     {
         vector<pair<string, double>> cashflow;
         vector<vector<string>> order_stats;
@@ -39,108 +41,76 @@ class Basic : public Strategy
         int collecter = 0;
         int position = 0;
         double cash_transaction = 0;
-        for (idx = 1; idx < n; idx++)
+        for (idx = 1; idx <= n; idx++)
         {
-            if (close_price[idx][0] >= close_price[idx - 1][0])
+            if (data[idx][0] >= data[idx - 1][0])
             {
                 collecter++;
-                close_price[idx][1] = 1;
+                data[idx][1] = 1;
             }
             else
             {
                 collecter--;
-                close_price[idx][1] = -1;
+                data[idx][1] = -1;
             }
         }
 
         int lower = 0;
-        int upper = idx;
-        while (upper < close_price.size())
+        int upper = idx - 1;
+        while (upper < data.size())
         {
-            if (collecter == n - 1)
+            if (collecter == n)
             {
                 if (position < x)
                 {
-                    cash_transaction = cash_transaction - close_price[upper][0];
+                    cash_transaction = cash_transaction - data[upper][0];
                     position++;
                     // cout << position << endl;
-                    cashflow.push_back(make_pair(dates[upper], cash_transaction));
-                    vector<string> v = {dates[upper], "BUY", "1", to_string(close_price[upper][0])};
+                    // cashflow.push_back(make_pair(date[upper], cash_transaction));
+                    vector<string> v = {date[upper], "BUY", "1", to_string(data[upper][0])};
                     order_stats.push_back(v);
                 }
-                if (close_price[upper][0] >= close_price[upper - 1][0])
-                {
-
-                    close_price[upper][1] = 1;
-                }
-                else
-                {
-
-                    close_price[upper][1] = -1;
-                }
-
-                collecter = collecter + close_price[upper][1];
-
-                collecter = collecter - close_price[lower + 1][1];
-
-                upper++;
-                lower++;
             }
-            else if (collecter == -n + 1)
+            else if (collecter == -n)
             {
                 if (position > -x)
                 {
-                    cash_transaction = cash_transaction + close_price[upper][0];
+                    cash_transaction = cash_transaction + data[upper][0];
                     position--;
                     // cout << position << endl;
-                    cashflow.push_back(make_pair(dates[upper], cash_transaction));
-                    vector<string> v = {dates[upper], "SELL", "1", to_string(close_price[upper][0])};
+                    // cashflow.push_back(make_pair(date[upper], cash_transaction));
+                    vector<string> v = {date[upper], "SELL", "1", to_string(data[upper][0])};
                     order_stats.push_back(v);
                 }
-                if (close_price[upper][0] >= close_price[upper - 1][0])
-                {
-
-                    close_price[upper][1] = 1;
-                }
-                else
-                {
-
-                    close_price[upper][1] = -1;
-                }
-
-                collecter = collecter + close_price[upper][1];
-
-                collecter = collecter - close_price[lower + 1][1];
-
-                upper++;
-                lower++;
+            }
+            if (upper == data.size() - 1)
+            {
+                ;
             }
             else
             {
-
-                if (close_price[upper][0] >= close_price[upper - 1][0])
+                if (data[upper + 1][0] >= data[upper][0])
                 {
 
-                    close_price[upper][1] = 1;
+                    data[upper + 1][1] = 1;
                 }
                 else
                 {
 
-                    close_price[upper][1] = -1;
+                    data[upper + 1][1] = -1;
                 }
 
-                collecter = collecter + close_price[upper][1];
+                collecter = collecter + data[upper + 1][1];
 
-                collecter = collecter - close_price[lower + 1][1];
-
-                upper++;
-                lower++;
+                collecter = collecter - data[lower + 1][1];
             }
+            cashflow.push_back(make_pair(date[upper], cash_transaction));
+            upper++;
+            lower++;
         }
         double total_profit = 0;
 
-        total_profit = cash_transaction + (position * close_price.back()[0]);
-        // cout << total_profit << endl;
+        total_profit = cash_transaction + (position * data.back()[0]);
 
         Statistics ans;
         ans.daily_cashflow = cashflow;
@@ -154,7 +124,7 @@ class Basic : public Strategy
     {
         this->parse_args(args);
         this->get_data();
-        vector<vector<double>> transformed_close_prices{close_prices.size()};
+        std::vector<std::vector<double>> transformed_close_prices{close_prices.size()};
         // Make a 2D vector instead of a 1D vector
         for (int i = 0; i < close_prices.size(); i++)
         {
@@ -163,4 +133,8 @@ class Basic : public Strategy
         }
         this->stats = get_stats(transformed_close_prices, dates);
     };
+    ~Basic()
+    {
+        remove("basic.csv");
+    }
 };
