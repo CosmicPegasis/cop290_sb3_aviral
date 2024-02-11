@@ -1,5 +1,11 @@
+#include "adx.hpp"
+#include "best_of_all.hpp"
+#include "dma++.hpp"
+#include "dma.hpp"
 #include "linear_regression.hpp"
+#include "macd.hpp"
 #include "my_utils.hpp"
+#include "rsi.hpp"
 #include "strategy.hpp"
 #include <basic.hpp>
 #include <regex>
