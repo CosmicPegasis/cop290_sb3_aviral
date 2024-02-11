@@ -7,8 +7,7 @@
 using namespace std;
 class MACD : public Strategy
 {
-    int n, x, p, max_hold_days;
-    double c1, c2;
+    int n, x;
     std::string symbol, start, end;
     std::vector<std::string> dates;
     std::vector<double> close_prices;
