@@ -14,10 +14,12 @@ enum StrategyType
     BestOfAllStrat,
     PairsStrat,
 };
+
 struct Statistics
 {
     std::vector<std::pair<std::string, double>> daily_cashflow;
-    std::vector<std::pair<std::string, double>> order_statistics;
+    std::vector<std::vector<std::string>> order_statistics;
+    std::vector<std::vector<std::string>> order_statistics2;
     double final_pnl;
 };
 class Strategy
@@ -32,16 +34,14 @@ class Strategy
     {
         return stats.daily_cashflow;
     };
-    std::vector<std::pair<std::string, double>> get_order_statistics()
+    std::vector<std::vector<std::string>> get_order_statistics()
     {
         return stats.order_statistics;
     };
-};
-
-class Basic : public Strategy
-{
-  public:
-    Basic(std::vector<std::string> args){};
+    std::vector<std::vector<std::string>> get_order_statistics2()
+    {
+        return stats.order_statistics2;
+    };
 };
 
 class DMA : public Strategy
