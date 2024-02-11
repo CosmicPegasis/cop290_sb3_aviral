@@ -49,7 +49,7 @@ def write_close_price(stock_df: pd.DataFrame) -> None:
 
 def process_regression_date(dataframe):
     dataframe = dataframe.iloc[::-1]
-    temp_df = dataframe[["DATE", "OPEN", "CLOSE"]].shift(-1)
+    temp_df = dataframe[["DATE", "CLOSE", "OPEN"]].shift(-1)
     dataframe = dataframe[["CLOSE", "OPEN", "VWAP", "LOW", "HIGH", "NO OF TRADES"]]
     dataframe = temp_df.join(dataframe, lsuffix="cur")
     dataframe.drop(dataframe.tail(1).index, inplace=True)
