@@ -4,6 +4,7 @@ from dateutil import parser as date_parser
 import pandas as pd
 import jugaad_data.nse
 import os
+import sys
 
 
 def get_past_n_days(symbol: str, start_date: date, n: int) -> pd.DataFrame:
@@ -12,12 +13,16 @@ def get_past_n_days(symbol: str, start_date: date, n: int) -> pd.DataFrame:
     # We subtract one extra day from both because query_exchange is inclusive
     cur = n
     while df.shape[0] < n:
-        print(cur)
-        cur += 1
-        df = query_exchange(
-            symbol, start_date - relativedelta(days=cur), start_date - relativedelta(days=1)
-        )
+        try:
+            df = query_exchange(
+                symbol,
+                start_date - relativedelta(days=cur),
+                start_date - relativedelta(days=1),
+            )
 
+        except KeyError:
+            pass
+        cur += 1
     return df
 
 
@@ -42,19 +47,72 @@ def write_close_price(stock_df: pd.DataFrame) -> None:
     )
 
 
-import sys
+def process_regression_date(dataframe):
+    dataframe = dataframe.iloc[::-1]
+    temp_df = dataframe[["DATE", "OPEN", "CLOSE"]].shift(-1)
+    dataframe = dataframe[["CLOSE", "OPEN", "VWAP", "LOW", "HIGH", "NO OF TRADES"]]
+    dataframe = temp_df.join(dataframe, lsuffix="cur")
+    dataframe.drop(dataframe.tail(1).index, inplace=True)
+    return dataframe
+
+
+def write_dataframe(df, file_name):
+    df.to_csv(f"{file_name}", index=False, header=False, date_format="%d/%m/%Y")
+
+
+def create_linear_regression_data(
+    symbol, train_start_date, train_end_date, start_date, end_date, file_name
+):
+    """Gets data for linear regression"""
+    train_start_date = date_parser.parse(train_start_date, dayfirst=True)
+    train_end_date = date_parser.parse(train_end_date, dayfirst=True)
+    start_date = date_parser.parse(start_date, dayfirst=True)
+    end_date = date_parser.parse(end_date, dayfirst=True)
+
+    train_df = get_data(symbol, train_start_date, train_end_date, 1)
+    train_df = process_regression_date(train_df)
+    # train_df.to_csv(f"train_{file_name}.csv", index=False, header=False)
+    write_dataframe(train_df, f"train_{file_name}.csv")
+
+    trade_df = get_data(symbol, start_date, end_date, 1)
+    trade_df = process_regression_date(trade_df)
+    # trade_df.to_csv(f"trade_{file_name}.csv", index=False, header=False)
+    write_dataframe(trade_df, f"trade_{file_name}.csv")
+    # close, open, vwap, low, high, no of trades, open(cur)
+    # write train_df as it is for testing purposes
+    # predict_df = get_data(symbol, start_date, end_date, 1)
+    return
+
 
 if __name__ == "__main__":
-    symbol = sys.argv[1]
-    start_date = date_parser.parse(sys.argv[2], dayfirst=True)
-    end_date = date_parser.parse(sys.argv[3], dayfirst=True)
-    if len(sys.argv) == 4:
-        # Must be MACD
-        if start_date > end_date:
-            raise AssertionError("start date is greater than end date")
-        write_close_price(get_data(symbol, start_date, end_date, 0))
-
-    else:
-        # For any other strategy
-        n = int(sys.argv[4])
-        write_close_price(get_data(symbol, start_date, end_date, n))
+    strategy = sys.argv[1]
+    if strategy == "BASIC":
+        exit()
+    elif strategy == "DMA":
+        exit()
+    elif strategy == "DMA++":
+        exit()
+    elif strategy == "MACD":
+        exit()
+    elif strategy == "RSI":
+        exit()
+    elif strategy == "ADX":
+        exit()
+    elif strategy == "LINEAR_REGRESSION":
+        [
+            strategy,
+            symbol,
+            train_start_date,
+            train_end_date,
+            start_date,
+            end_date,
+            file_name,
+        ] = sys.argv[1:]
+        create_linear_regression_data(
+            symbol, train_start_date, train_end_date, start_date, end_date, file_name
+        )
+        exit()
+    elif strategy == "BEST_OF_ALL":
+        exit()
+    elif strategy == "PAIRS":
+        exit()
