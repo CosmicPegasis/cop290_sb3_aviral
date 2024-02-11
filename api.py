@@ -94,21 +94,44 @@ def create_basic_data(symbol, n, start, end, file_name):
     write_dataframe(df[["DATE", "CLOSE"]], file_name)
 
 
+def create_adx_data(symbol, n, start, end, file_name):
+    start = date_parser.parse(start, dayfirst=True)
+    end = date_parser.parse(end, dayfirst=True)
+    n = int(n)
+    df = get_data(symbol, start, end, n)
+    write_dataframe(df[["DATE", "CLOSE", "HIGH", "LOW"]], file_name)
+
+
+def create_linear_regression_special_data(symbol, start, end, file_name):
+    startc = date_parser.parse(start, dayfirst=True)
+    endc = date_parser.parse(end, dayfirst=True)
+    train_start = (startc - relativedelta(years=1)).strftime("%d/%m/%Y")
+    train_end = (endc - relativedelta(years=1)).strftime("%d/%m/%Y")
+    create_linear_regression_data(
+        symbol, str(train_start), str(train_end), start, end, file_name
+    )
+
+
 if __name__ == "__main__":
     strategy = sys.argv[1]
     if strategy == "BASIC":
         [symbol, n, start, end, file_name] = sys.argv[2:]
         create_basic_data(symbol, n, start, end, file_name)
     elif strategy == "DMA":
-        exit()
+        [symbol, n, start, end, file_name] = sys.argv[2:]
+        create_basic_data(symbol, n, start, end, file_name)
     elif strategy == "DMA++":
-        exit()
+        [symbol, n, start, end, file_name] = sys.argv[2:]
+        create_basic_data(symbol, n, start, end, file_name)
     elif strategy == "MACD":
-        exit()
+        [symbol, n, start, end, file_name] = sys.argv[2:]
+        create_basic_data(symbol, n, start, end, file_name)
     elif strategy == "RSI":
-        exit()
+        [symbol, n, start, end, file_name] = sys.argv[2:]
+        create_basic_data(symbol, n, start, end, file_name)
     elif strategy == "ADX":
-        exit()
+        [symbol, n, start, end, file_name] = sys.argv[2:]
+        create_adx_data(symbol, n, start, end, file_name)
     elif strategy == "LINEAR_REGRESSION":
         [
             strategy,
@@ -122,7 +145,9 @@ if __name__ == "__main__":
         create_linear_regression_data(
             symbol, train_start_date, train_end_date, start_date, end_date, file_name
         )
-        exit()
+    elif strategy == "LINEAR_REGRESSION_SPECIAL":
+        [symbol, start, end, file_name] = sys.argv[2:]
+        create_linear_regression_special_data(symbol, start, end, file_name)
     elif strategy == "BEST_OF_ALL":
         exit()
     elif strategy == "PAIRS":
