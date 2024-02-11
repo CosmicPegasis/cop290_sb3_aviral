@@ -1,27 +1,30 @@
-#include "arg_parser.hpp"
-#include "my_utils.hpp"
-#include "../daksh/basic.cpp"
-#include "csv_parser.hpp"
-int main(int argc, char** argv)
+// #include "linear_regression.cpp"
+#include <csv_writer.hpp>
+#include <decider.hpp>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+int main(int argc, char **argv)
 {
-  // Write an argument parser
-  // Write a choice decider
-  // Glue together code to check if it works
-  // Write a makefile
-  ArgParser args(argc, argv);
-  ClosePriceParser csv("close_price.csv");
-  vector<double> close_price = csv.get_close_price();
-  vector<vector<double>> data(close_price.size(), vector<double>(2,0));
-  for(int i = 0; i < close_price.size(); i++){
-    data[i][0] = close_price[i];
-  }
-  print(close_price);
-  print(csv.get_dates());
-  vector<string> date = csv.get_dates();
-  int x = 1;
-  int n = 2;
-  basic(data, n, x, date);
-return 0;
+    // Write a wrapper for LinearRegression
+    // Write a wrapper for all of Daksh's code
+    // vector<vector<double>> x = {
+    //     {0.509, 0.508, 0.011, 0.551, 0.671, 0.632, 0.202}, {0.728, 0.637, 0.473, 0.783, 0.472, 0.394, 0.968},
+    //     {0.935, 0.644, 0.901, 0.312, 0.055, 0.496, 0.364}, {0.027, 0.89, 0.876, 0.537, 0.157, 0.866, 0.225},
+    //     {0.698, 0.31, 0.095, 0.969, 0.274, 0.646, 0.79},   {0.052, 0.813, 0.676, 0.111, 0.277, 0.117, 0.058},
+    //     {0.824, 0.83, 0.199, 0.75, 0.659, 0.174, 0.657},   {0.827, 0.556, 0.905, 0.903, 0.789, 0.627, 0.457},
+    //     {0.884, 0.472, 0.381, 0.437, 0.961, 0.76, 0.806},  {0.043, 0.278, 0.139, 0.478, 0.124, 0.972, 0.745}};
+    // vector<double> y = {3.084, 4.455, 3.708, 3.578, 3.78, 2.103, 4.093, 5.064, 4.701, 2.779};
+    vector<string> args = {"LINEAR_REGRESSION", "SBIN",       "5",          "20",
+                           "03/02/2020",        "04/02/2021", "05/02/2023", "09/02/2023"};
+    StrategyChooser choose(args);
+    CSVWriter order_statistics("order_statistics.csv");
+    CSVWriter daily_cashflow("daily_cashflow.csv");
+    order_statistics.write(choose.get_orders());
+    daily_cashflow.write(choose.get_cashflow());
+    return 0;
 }
 
 // Strategy Decider
@@ -36,9 +39,9 @@ void macd(vector<double> close_price, vector<double> open_price, vector<string> 
 
 void rsi(vector<vector<double>> data, int n, int x, vector<string> date, double oversold, double overbought)
 
-void LinearRegression // TODO
 
 void BestOfALL // TODO
 
-void pairs_sl(vector<vector<double>> data, int n, int x, vector<string> date, int p, double threshold,double stop_loss_threshold)
+void pairs_sl(vector<vector<double>> data, int n, int x, vector<string> date, int p, double threshold,double
+stop_loss_threshold)
  */
