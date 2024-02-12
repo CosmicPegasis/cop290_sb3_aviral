@@ -13,6 +13,7 @@ enum StrategyType
     LinearRegressionStrat,
     BestOfAllStrat,
     PairsStrat,
+    PairsSLStrat,
 };
 
 struct Statistics
@@ -42,51 +43,4 @@ class Strategy
     {
         return stats.order_statistics2;
     };
-};
-
-class DMA : public Strategy
-{
-  public:
-    DMA(std::vector<std::string> args){};
-};
-
-class DMAPlusPlus : public Strategy
-{
-  public:
-    DMAPlusPlus(std::vector<std::string> args){};
-};
-
-class MACD : public Strategy
-{
-  public:
-    MACD(std::vector<std::string> args){};
-};
-
-class RSI : public Strategy
-{
-  public:
-    RSI(std::vector<std::string> args){};
-};
-
-class ADX : public Strategy
-{
-  public:
-    ADX(std::vector<std::string> args){};
-};
-// class LinearRegression : public Strategy
-// {
-//   public:
-//     LinearRegression(std::vector<std::string> args){};
-// };
-
-class BestOfAll : public Strategy
-{
-  public:
-    BestOfAll(std::vector<std::string> args){};
-};
-
-class PairsSL : public Strategy
-{
-  public:
-    PairsSL(std::vector<std::string> args){};
 };

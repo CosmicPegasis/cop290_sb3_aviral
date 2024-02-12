@@ -1,13 +1,15 @@
 #include "adx.hpp"
+#include "basic.hpp"
 #include "best_of_all.hpp"
 #include "dma++.hpp"
 #include "dma.hpp"
 #include "linear_regression.hpp"
 #include "macd.hpp"
 #include "my_utils.hpp"
+#include "pairs.hpp"
+#include "pairs_sl.hpp"
 #include "rsi.hpp"
 #include "strategy.hpp"
-#include <basic.hpp>
 #include <regex>
 #include <stdexcept>
 #include <string>
@@ -72,8 +74,16 @@ class StrategyChooser
         }
         else if (input_strategy == "PAIRS")
         {
-            choice = PairsStrat;
-            strategy = PairsSL{args};
+            if (args.size() == 7)
+            {
+                choice = PairsStrat;
+                strategy = Pairs{args};
+            }
+            else if (args.size() == 8)
+            {
+                choice = PairsSLStrat;
+                strategy = PairsSL{args};
+            }
         }
         else
         {
