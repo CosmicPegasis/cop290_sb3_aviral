@@ -1,6 +1,6 @@
 # COP290: ASSIGNMENT 1
 
-## Insights
+## STOCK TRADING STRATEGIES
 
-
+### BASIC MONOTONE OBSERVATION
 1. Open index.html in your browser.
