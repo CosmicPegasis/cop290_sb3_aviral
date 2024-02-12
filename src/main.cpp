@@ -15,14 +15,18 @@ int main(int argc, char **argv)
     ArgParser arg(argc, argv);
     vector<string> args = arg.get_arguments();
     StrategyChooser choose(args);
-    CSVWriter order_statistics("order_statistics.csv");
-    CSVWriter daily_cashflow("daily_cashflow.csv");
     if (choose.get_strategy_used() == PairsStrat || choose.get_strategy_used() == PairsSLStrat)
     {
+        CSVWriter order_statistics("order_statistics1.csv");
         CSVWriter order_statistics2("order_statistics2.csv");
         order_statistics2.write(choose.get_orders2());
     }
-    order_statistics.write(choose.get_orders());
+    else
+    {
+        CSVWriter order_statistics("order_statistics.csv");
+        order_statistics.write(choose.get_orders());
+    }
+    CSVWriter daily_cashflow("daily_cashflow.csv");
     daily_cashflow.write(choose.get_cashflow());
     ofstream pnl;
     pnl.open("final_pnl.txt");

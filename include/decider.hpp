@@ -100,11 +100,16 @@ class StrategyChooser
     }
     std::vector<std::vector<string>> get_orders()
     {
-        return strategy.get_order_statistics();
+        std::vector<std::vector<string>> orders = strategy.get_order_statistics();
+        orders.insert(orders.begin(), {"Date", "Order_dir", "Quantity", "Price"});
+        return orders;
     }
+
     std::vector<std::vector<std::string>> get_orders2()
     {
-        return strategy.get_order_statistics2();
+        std::vector<std::vector<string>> orders = strategy.get_order_statistics2();
+        orders.insert(orders.begin(), {"Date", "Order_dir", "Quantity", "Price"});
+        return orders;
     }
     std::vector<std::vector<std::string>> get_cashflow()
     {
@@ -115,6 +120,7 @@ class StrategyChooser
             cashflow[i][0] = typed_stats[i].first;
             cashflow[i][1] = to_string(typed_stats[i].second);
         }
+        cashflow.insert(cashflow.begin(), {"Date", "Cashflow"});
         return cashflow;
     }
 };
