@@ -17,8 +17,8 @@ int main(int argc, char **argv)
     StrategyChooser choose(args);
     if (choose.get_strategy_used() == PairsStrat || choose.get_strategy_used() == PairsSLStrat)
     {
-        CSVWriter order_statistics("order_statistics1.csv");
-        CSVWriter order_statistics2("order_statistics2.csv");
+        CSVWriter order_statistics("order_statistics_1.csv");
+        CSVWriter order_statistics2("order_statistics_2.csv");
         order_statistics2.write(choose.get_orders2());
     }
     else
