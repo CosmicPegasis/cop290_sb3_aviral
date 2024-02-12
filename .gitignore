@@ -7,5 +7,5 @@ debug
 main
 \#*\#
 *.csv
-*.txt
+final_pnl.txt
 test.py
