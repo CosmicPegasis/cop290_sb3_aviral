@@ -47,10 +47,10 @@ SOURCES := $(wildcard src/*.cpp)
 INCLUDES := $(wildcard include/*.hpp)
 OBJECTS := $(SOURCES:.cpp=.o)
 all: main aviral_requirements
-main: $(OBJECTS)
+main: $(OBJECTS) 
 	g++ -Iinclude/ src/*.o -o main -fopenmp
 
-src/%.o: src/%.cpp
+src/%.o: src/%.cpp $(INCLUDES)
 	g++ -Iinclude/ $< -c -o $@
 
 aviral_requirements: requirements.txt
@@ -58,5 +58,5 @@ aviral_requirements: requirements.txt
 	touch aviral_requirements
 # debug: include/*.hpp src/*.cpp
 # 	g++ -g -I include/ src/*.cpp -o debug -fopenmp
-# clean:
-# 	rm main debug src/*.o
+clean:
+	rm main debug $(OBJECTS) *.csv
