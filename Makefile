@@ -1,5 +1,4 @@
-all: include/*.hpp src/*.cpp
-	g++ -I include/ src/*.cpp -o main -fopenmp
+default: all
 ifeq ($(strategy), BASIC)	
 	./main $(strategy) $(symbol) $(n) $(x) $(start_date) $(end_date)
 else 
@@ -44,7 +43,20 @@ endif
 endif
 endif
 endif
-debug: include/*.hpp src/*.cpp
-	g++ -g -I include/ src/*.cpp -o debug -fopenmp
-clean:
-	rm main debug
+SOURCES := $(wildcard src/*.cpp)
+INCLUDES := $(wildcard include/*.hpp)
+OBJECTS := $(SOURCES:.cpp=.o)
+all: main aviral_requirements
+main: $(OBJECTS)
+	g++ -Iinclude/ src/*.o -o main -fopenmp
+
+src/%.o: src/%.cpp
+	g++ -Iinclude/ $< -c -o $@
+
+aviral_requirements: requirements.txt
+	pip install -r requirements.txt
+	touch aviral_requirements
+# debug: include/*.hpp src/*.cpp
+# 	g++ -g -I include/ src/*.cpp -o debug -fopenmp
+# clean:
+# 	rm main debug src/*.o
