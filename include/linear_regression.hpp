@@ -48,7 +48,6 @@ class LinearRegressionCore
         if (x.size() == 0)
             throw std::runtime_error("cannot pass empty dataset");
         theta = calculte_theta();
-        print(theta);
         this->trained = true;
     }
     LinearRegressionCore(){};
