@@ -1,10 +1,7 @@
-#ifndef MY_VECTOR_UTILS_H
-#define MY_VECTOR_UTILS_H
-
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-
+#pragma once
 template <typename T> void print(const std::vector<T> &v)
 {
     for (auto &elem : v)
@@ -57,4 +54,3 @@ template <typename T> std::vector<T> slice(const std::vector<T> &v, const int st
         return std::vector<T>(v.begin() + start, v.begin() + end);
     }
 }
-#endif
