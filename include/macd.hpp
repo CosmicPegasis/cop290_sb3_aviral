@@ -1,10 +1,8 @@
-#include "csv_parser.hpp"
 #include "strategy.hpp"
 #include <cmath>
 #include <iostream>
 
 #pragma once
-using namespace std;
 class MACD : public Strategy
 {
     int n, x;
@@ -15,9 +13,9 @@ class MACD : public Strategy
 
     void get_data();
 
-    Statistics macd(vector<double> close_price, vector<string> date, int x);
+    Statistics macd(std::vector<double> close_price, std::vector<std::string> date, int x);
 
-    Statistics get_stats(vector<vector<double>> data, vector<string> date);
+    Statistics get_stats(std::vector<std::vector<double>> data, std::vector<std::string> date);
 
   public:
     MACD(std::vector<std::string> args);
