@@ -93,8 +93,12 @@ The strategy offers flexibility through configurable parameters such as stop_los
 
 
 ### GRAPHS
-Note that the parameter for prediction are taken same as given in the assignment file, unless mentioned.
+Note that the parameter for prediction are same as given in the assignment file, unless mentioned.
 
 ##### 1. BASIC
 ![Screenshot 2024-02-13 170928](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/bb947adf-4120-43ad-acc8-03735174082c)
+
+##### 2. DMA
+![Screenshot 2024-02-13 170831](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/ae9b5beb-5f0f-4ffb-b2fd-645bef4c8b93)
+
 
