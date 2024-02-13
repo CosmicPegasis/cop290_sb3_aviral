@@ -9,3 +9,4 @@ main
 *.csv
 final_pnl.txt
 test.py
+*.o
