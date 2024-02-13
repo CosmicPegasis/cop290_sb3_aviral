@@ -1,4 +1,4 @@
-# COP290: ASSIGNMENT 1
+# COP290: ASSIGNMENT 1 - SUB-3
 
 ## STOCK TRADING STRATEGIES
 
@@ -85,8 +85,40 @@ The strategy calculates the rolling mean and rolling standard deviation of the s
 
  ### 10. Stop-Loss in Pairs Trading Strategy
 
- ##### INSIGHTS
+##### HOW IT WORKS 
+The strategy is same as the pair_trading strategy (strategy-9) but here we put an additional constraint that if z_score of a particular position crosses the stop_threshold then we close that position. Also, if we have a positive position and if a sell signal is generated then we sell that stock which we bought earlier. Similarly, for short-selling we buy that stock which we sold earlier. Also to calcualte the z_score for checking if it crosses the max_hold_days, we use the original mean and standard deviation at which the position was opened.
+
+##### INSIGHTS
 The inclusion of a stop-loss based constraint in the pairs trading strategy enhances risk management capabilities. By setting a stop-loss threshold, traders can mitigate potential losses by automatically closing positions when the spread deviates beyond an acceptable level. 
 This proactive approach helps limit downside risk and preserves capital in volatile market conditions.
 By monitoring the movement of the z-score, which reflects deviations from the expected mean, the strategy identifies unfavorable trends and takes prompt action to exit positions, thereby minimizing exposure to adverse market movements.
-The strategy offers flexibility through configurable parameters such as stop_loss_threshold, allowing traders to tailor the stop-loss mechanism to their risk tolerance and trading preferences. 
+The strategy offers flexibility through configurable parameters such as stop_loss_threshold, allowing traders to tailor the stop-loss mechanism to their risk tolerance and trading preferences.
+
+
+### GRAPHS
+Note that the parameter for prediction are same as given in the assignment file, unless mentioned.
+
+##### 1. BASIC
+![Screenshot 2024-02-13 170928](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/bb947adf-4120-43ad-acc8-03735174082c)
+
+##### 2. DMA
+![Screenshot 2024-02-13 173351](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/0706305d-6716-4a53-88e4-0bea5e1fd53a)
+
+##### 3. DMA++
+![Screenshot 2024-02-13 170831](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/ae9b5beb-5f0f-4ffb-b2fd-645bef4c8b93)
+
+##### 4. MACD
+![Screenshot 2024-02-13 171439](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/f2f9952b-1376-4aea-9eea-b1f5004c23ab)
+
+##### 5. RSI
+![Screenshot 2024-02-13 172356](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/1745e146-8cfc-414e-b035-3a2ce887a519)
+
+##### 6. ADX
+![Screenshot 2024-02-13 171740](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/5be5b936-53b7-48cf-98ab-108afddb0e21)
+
+##### 7. PAIRS
+![Screenshot 2024-02-13 173848](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/dcdc22a3-a82e-46a2-ae0a-eec0781aa2d9)
+
+##### 8. PAIRS_STOP_LOSS
+![Screenshot 2024-02-13 172936](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/0b838d0d-31f3-4b29-b628-80be9481fc6d)
+
