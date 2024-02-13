@@ -17,12 +17,6 @@ void DMA::parse_args(std::vector<std::string> &args)
     p = stoi(args[3]);
     start = args[4];
     end = args[5];
-    std::cout << "symbol " << symbol;
-    std::cout << "n " << n;
-    std::cout << "x " << x;
-    std::cout << "p " << p;
-    std::cout << "start " << start;
-    std::cout << "end " << end;
 }
 
 void DMA::get_data()
@@ -61,8 +55,6 @@ Statistics DMA::get_stats(std::vector<std::vector<double>> data, std::vector<std
     {
         double mean = sum / double(n);
         double sd = sqrt(((sum_sq) / double(n)) - (mean * mean));
-        // cout << date[upper] << " " << data[upper][0] - mean << "->" << mean << " " << sd << " " << p * sd << " "
-        // << data[upper][0] << endl;
 
         if (data[upper][0] >= mean + (p * sd))
         {
@@ -71,7 +63,6 @@ Statistics DMA::get_stats(std::vector<std::vector<double>> data, std::vector<std
             {
                 cash_transaction = cash_transaction - data[upper][0];
                 position++;
-                // cout << position << endl;
 
                 vector<string> v = {date[upper], "BUY", "1", to_string(data[upper][0])};
                 order_stats.push_back(v);
@@ -83,7 +74,6 @@ Statistics DMA::get_stats(std::vector<std::vector<double>> data, std::vector<std
             {
                 cash_transaction = cash_transaction + data[upper][0];
                 position--;
-                // cout << position << endl;
 
                 vector<string> v = {date[upper], "SELL", "1", to_string(data[upper][0])};
                 order_stats.push_back(v);
@@ -103,18 +93,15 @@ Statistics DMA::get_stats(std::vector<std::vector<double>> data, std::vector<std
 
         lower++;
         upper++;
-        // cout << "----------" << endl;
     }
 
     total_profit = cash_transaction + (position * data.back()[0]);
-    // cout << total_profit << endl;
 
     Statistics ans;
     ans.daily_cashflow = cashflow;
     ans.final_pnl = total_profit;
     ans.order_statistics = order_stats;
 
-    // cout << total_profit << endl;
     return ans;
 }
 

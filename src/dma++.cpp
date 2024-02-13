@@ -20,15 +20,6 @@ void DMAPlusPlus::parse_args(std::vector<std::string> &args)
     c2 = stod(args[6]);
     start = args[7];
     end = args[8];
-    cout << "symbol " << symbol << endl;
-    cout << "x " << x << endl;
-    cout << "p " << p << endl;
-    cout << "n " << n << endl;
-    cout << "max_hold_days " << max_hold_days << endl;
-    cout << "c1 " << c1 << endl;
-    cout << "c2 " << c2 << endl;
-    cout << "start " << start << endl;
-    cout << "end " << end << endl;
 }
 
 void DMAPlusPlus::get_data()
@@ -83,7 +74,6 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
             ER = ER / absolute_change;
         }
 
-        ////cout<<ER<<"->"<<date[idx]<<endl;
         double num = double(2 * ER) / double(1 + c2);
         if (idx == n - 1)
         {
@@ -103,14 +93,8 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
             AMA = AMA + (SF * (data[idx][0] - AMA));
         }
         string s = "none";
-        cout << dates[idx] << "->" << SF << "->" << AMA << endl;
         if (days_monitor.size() > 0)
         {
-            for (int i = 0; i < days_monitor.size(); i++)
-            {
-                cout << days_monitor[i] << " ";
-            }
-            cout << endl;
             if (days_monitor[0] >= max_hold_days)
             {
 
@@ -120,8 +104,6 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                     cash_transaction = cash_transaction + data[idx][0];
                     days_monitor.erase(days_monitor.begin() + 0);
                     position--;
-                    cout << "SELLO" << endl;
-                    cout << position << endl;
 
                     vector<string> v = {dates[idx], "SELL", "1", to_string(data[idx][0])};
                     order_stats.push_back(v);
@@ -130,11 +112,8 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                 {
                     s = "buy";
                     cash_transaction = cash_transaction - data[idx][0];
-                    ////cout<<days_monitor.size()<<endl;
                     days_monitor.erase(days_monitor.begin() + 0);
-                    cout << "BUYO" << endl;
                     position++;
-                    cout << position << endl;
 
                     vector<string> v = {dates[idx], "BUY", "1", to_string(data[idx][0])};
                     order_stats.push_back(v);
@@ -160,7 +139,6 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                             days_monitor.push_back(0);
                         }
                         position++;
-                        /// cout << position << endl;
 
                         vector<string> v = {dates[idx], "BUY", "1", to_string(data[idx][0])};
                         order_stats.push_back(v);
@@ -178,7 +156,6 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                         }
                         order_stats.pop_back();
                         position++;
-                        ////////cout << position << endl;
                     }
                     else if (s == "buy")
                     {
@@ -212,7 +189,6 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                             days_monitor.push_back(0);
                         }
                         position--;
-                        //////cout << position << endl;
 
                         vector<string> v = {dates[idx], "SELL", "1", to_string(data[idx][0])};
                         order_stats.push_back(v);
@@ -230,7 +206,6 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                         }
                         order_stats.pop_back();
                         position--;
-                        ////cout << position << endl;
                     }
                     else if (s == "sell")
                     {
@@ -247,29 +222,19 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                         order_stats.back()[2] = "2";
                     }
                 }
-                // cout<<position<<endl;
             }
         }
 
-        cout << position << endl;
         cashflow.push_back(make_pair(dates[idx], cash_transaction));
         idx++;
     }
 
     total_profit = cash_transaction + (position * data.back()[0]);
-    ////cout << total_profit << endl;
-
-    for (int i = 0; i < order_stats.size(); i++)
-    {
-        cout << order_stats[i][0] << "->" << order_stats[i][1] << "->" << order_stats[i][2] << "->" << order_stats[i][3]
-             << endl;
-    }
 
     Statistics ans;
     ans.daily_cashflow = cashflow;
     ans.final_pnl = total_profit;
     ans.order_statistics = order_stats;
-    cout << total_profit << endl;
 
     return ans;
 }
@@ -289,5 +254,5 @@ DMAPlusPlus::DMAPlusPlus(std::vector<std::string> args)
 };
 DMAPlusPlus::~DMAPlusPlus()
 {
-    // remove("dmaplusplus.csv");
+    remove("dmaplusplus.csv");
 }

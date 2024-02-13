@@ -1,6 +1,5 @@
 #include "pairs_sl.hpp"
 #include "csv_parser.hpp"
-#include "my_utils.hpp"
 #include "strategy.hpp"
 #include <cmath>
 #include <iostream>
@@ -21,14 +20,6 @@ void PairsSL::parse_args(std::vector<std::string> &args)
     stop_loss_threshold = stod(args[5]);
     start = args[6];
     end = args[7];
-    cout << "symbol1 " << symbol1 << endl;
-    cout << "symbol2 " << symbol2 << endl;
-    cout << "x " << x << endl;
-    cout << "n " << n << endl;
-    cout << "threshold " << threshold << endl;
-    cout << "stop_loss_threshold " << stop_loss_threshold << endl;
-    cout << "start " << start << endl;
-    cout << "end " << end << endl;
 }
 
 void PairsSL::get_data()
@@ -50,7 +41,6 @@ void PairsSL::get_data()
         data[i][0] = price1[i];
         data[i][1] = price2[i];
     }
-    print(data);
 }
 
 Statistics PairsSL::get_stats()
@@ -59,7 +49,6 @@ Statistics PairsSL::get_stats()
     vector<vector<string>> order_stats;
     vector<vector<string>> order_stats1;
     int min_pos = 90;
-    // cout<<"In"<<endl;
     double total_profit = 0;
     int position = 0;
     double cash_transaction = 0;
@@ -68,9 +57,6 @@ Statistics PairsSL::get_stats()
 
     for (int upper = n - 1; upper < data.size(); upper++)
     {
-        cout << dates[upper] << endl;
-        // cout<<upper<<endl;
-        ////cout<<position<<" "<<loss_monitor.size()<<endl;
         double sum = 0;
         double sum_sq = 0;
         for (int i = upper + 1 - n; i <= upper; i++)
@@ -82,28 +68,20 @@ Statistics PairsSL::get_stats()
         double sd = sqrt(((sum_sq) / double(n)) - (mean * mean));
         double spread = data[upper][0] - data[upper][1];
         double z_score = (spread - mean) / sd;
-        // cout<<"Z_score"<<z_score<<"->"<<sd<<endl;
         string s = "none";
         int pos_closed = 0;
         vector<vector<double>> to_be_contained;
-        // cout<<"PREV"<<loss_monitor.size()<<endl;
-        ////////cout<<"The loss_monitor"<<"->";
-        // for(int i=0;i<loss_monitor.size();i++){
-        //     //////cout<<"("<<loss_monitor[i][0]<<" "<<loss_monitor[i][1]<<")";
-        // }//////cout<<endl;
 
         int number_of_stocks_traded = 0;
         for (int i = 0; i < loss_monitor.size(); i++)
         {
             double new_z_score = (spread - (loss_monitor[i][0])) / loss_monitor[i][1];
-            //////cout<<"("<<loss_monitor[i][0]<<"->"<<loss_monitor[i][1]<<"->"<<new_z_score;
             if (new_z_score > stop_loss_threshold)
             {
                 pos_closed++;
                 if (position > 0)
                 {
                     s = "sell";
-                    cout << "sello" << endl;
                     cash_transaction = cash_transaction + data[upper][0] - data[upper][1];
                     number_of_stocks_traded++;
                     vector<string> v = {dates[upper], "SELL", "1", to_string(data[upper][0])};
@@ -115,7 +93,6 @@ Statistics PairsSL::get_stats()
                 {
                     s = "buy";
                     cash_transaction = cash_transaction - data[upper][0] + data[upper][1];
-                    cout << "BUYO" << endl;
                     number_of_stocks_traded++;
                     vector<string> v = {dates[upper], "BUY", "1", to_string(data[upper][0])};
                     order_stats.push_back(v);
@@ -138,14 +115,10 @@ Statistics PairsSL::get_stats()
             position = position + pos_closed;
         }
 
-        //////cout<<"z_score : "<<z_score<<endl;
         if (z_score > threshold)
         {
-            // cout<<"SELL"<<loss_monitor.size()<<endl;
             if (position > -x)
             {
-                cout << "sell" << endl;
-                //////cout<<"SELL"<<endl;
                 if (s == "none")
                 {
 
@@ -160,7 +133,6 @@ Statistics PairsSL::get_stats()
                     }
                     cash_transaction = cash_transaction + data[upper][0] - data[upper][1];
                     position--;
-                    //////////cout << position << endl;
 
                     vector<string> v = {dates[upper], "SELL", "1", to_string(data[upper][0])};
                     order_stats.push_back(v);
@@ -227,7 +199,6 @@ Statistics PairsSL::get_stats()
         else if (z_score < -threshold)
         {
 
-            //////cout<<"BUY"<<endl;
             if (position < x)
             {
 
@@ -236,9 +207,7 @@ Statistics PairsSL::get_stats()
 
                     if (position < 0)
                     {
-                        // cout<<"position < 0"<<loss_monitor.size()<<endl;
                         loss_monitor.erase(loss_monitor.begin() + 0);
-                        // cout<<"position < 0"<<loss_monitor.size()<<endl;
                     }
                     else
                     {
@@ -247,7 +216,6 @@ Statistics PairsSL::get_stats()
                     }
                     cash_transaction = cash_transaction + data[upper][1] - data[upper][0];
                     position++;
-                    //////////cout << position << endl;
 
                     vector<string> v = {dates[upper], "BUY", "1", to_string(data[upper][0])};
                     order_stats.push_back(v);
@@ -256,7 +224,6 @@ Statistics PairsSL::get_stats()
                 }
                 else if (s == "buy")
                 {
-                    // cout<<"buy"<<loss_monitor.size()<<endl;
                     for (int i = 0; i < number_of_stocks_traded; i++)
                     {
                         order_stats.pop_back();
@@ -274,7 +241,6 @@ Statistics PairsSL::get_stats()
                     }
                     cash_transaction = cash_transaction + data[upper][1] - data[upper][0];
                     position++;
-                    //////////cout << position << endl;
                     vector<string> v = {dates[upper], "BUY", to_string(number_of_stocks_traded + 1),
                                         to_string(data[upper][0])};
                     order_stats.push_back(v);
@@ -284,7 +250,6 @@ Statistics PairsSL::get_stats()
                 }
                 else if (s == "sell")
                 {
-                    // cout<<"sell"<<loss_monitor.size()<<endl;
                     for (int i = 0; i < number_of_stocks_traded; i++)
                     {
                         order_stats.pop_back();
@@ -302,7 +267,6 @@ Statistics PairsSL::get_stats()
                     }
                     cash_transaction = cash_transaction + data[upper][1] - data[upper][0];
                     position++;
-                    //////////cout << position << endl;
 
                     if (number_of_stocks_traded - 1 > 0)
                     {
@@ -317,34 +281,15 @@ Statistics PairsSL::get_stats()
             }
         }
 
-        //////cout<<"order_stats : "<<endl;
-        for (int i = 0; i < order_stats.size(); i++)
-        {
-            //////cout<<order_stats[i][0]<<" "<<order_stats[i][1]<<" "<<order_stats[i][2]<<endl;
-        }
         cashflow.push_back(make_pair(dates[upper], cash_transaction));
     }
 
     total_profit = cash_transaction + (position * (data.back()[0] - data.back()[1]));
-    ////////////cout << total_profit << endl;
     Statistics ans;
     ans.daily_cashflow = cashflow;
     ans.final_pnl = total_profit;
-    cout << total_profit << "\n";
     ans.order_statistics = order_stats;
     ans.order_statistics2 = order_stats1;
-    for (int i = 0; i < order_stats.size(); i++)
-    {
-        //////////cout<<order_stats[i][0]<<"->"<<order_stats[i][1]<<" "<<order_stats[i][2]<<"
-        ///"<<order_stats[i][3]<<endl;
-    }
-    for (int i = 0; i < order_stats1.size(); i++)
-    {
-        cout << order_stats1[i][1] << stoi(order_stats1[i][3]) << " " << order_stats[i][1] << order_stats[i][3] << " "
-             << stoi(order_stats[i][3]) - stoi(order_stats1[i][3]) << endl;
-    }
-    // cout<<"OUT"<<endl;
-    cout << total_profit << endl;
     return ans;
 }
 
@@ -352,7 +297,6 @@ PairsSL::PairsSL(std::vector<std::string> args)
 {
     this->parse_args(args);
     this->get_data();
-    print(this->data);
     this->stats = get_stats();
 };
 PairsSL::~PairsSL()

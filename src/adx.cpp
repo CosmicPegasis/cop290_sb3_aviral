@@ -17,12 +17,6 @@ void ADX::parse_args(std::vector<std::string> &args)
     adx_threshold = stod(args[3]);
     start = args[4];
     end = args[5];
-    cout << "symbol " << symbol << endl;
-    cout << "x " << x << endl;
-    cout << "n " << n << endl;
-    cout << "adx_threshold " << adx_threshold << endl;
-    cout << "start " << start << endl;
-    cout << "end " << end << endl;
 }
 
 void ADX::get_data()
@@ -56,7 +50,6 @@ Statistics ADX::get_stats(vector<vector<double>> data, vector<string> dates)
     double ADX = 0;
 
     double alpha = double(2) / double(n + 1);
-    cout << alpha << endl;
     for (int idx = 1; idx < data.size(); idx++)
     {
         double DX = 0;
@@ -98,7 +91,6 @@ Statistics ADX::get_stats(vector<vector<double>> data, vector<string> dates)
             }
             ADX = ADX + (alpha * (DX - ADX));
         }
-        // cout<<date[idx]<<"->"<<ADX<<"->"<<DI_plus<<"->"<<DI_minus<<"->"<<DM_minus<<"->"<<DM_plus<<"->"<<ATR<<"->"<<TR<<endl;
         if (DX != 0)
         {
             if (ADX > adx_threshold)
@@ -107,8 +99,6 @@ Statistics ADX::get_stats(vector<vector<double>> data, vector<string> dates)
                 {
                     cash_transaction = cash_transaction - data[idx][0];
                     position++;
-                    cout << dates[idx] << "->"
-                         << "BUY" << endl;
                     vector<string> v = {dates[idx], "BUY", "1", to_string(data[idx][0])};
                     order_stats.push_back(v);
                 }
@@ -119,8 +109,6 @@ Statistics ADX::get_stats(vector<vector<double>> data, vector<string> dates)
                 {
                     cash_transaction = cash_transaction + data[idx][0];
                     position--;
-                    cout << dates[idx] << "->"
-                         << "SELL" << endl;
                     vector<string> v = {dates[idx], "SELL", "1", to_string(data[idx][0])};
                     order_stats.push_back(v);
                 }
@@ -137,7 +125,6 @@ Statistics ADX::get_stats(vector<vector<double>> data, vector<string> dates)
     ans.final_pnl = total_profit;
     ans.order_statistics = order_stats;
 
-    cout << total_profit << endl;
     return ans;
 }
 

@@ -36,7 +36,6 @@ Statistics Basic::get_stats(vector<vector<double>> data, vector<string> date)
     int collecter = 0;
     int position = 0;
     double cash_transaction = 0;
-    // cout<<"Function call"<<endl;
 
     for (int idx = n; idx < data.size(); idx++)
     {
@@ -79,14 +78,12 @@ Statistics Basic::get_stats(vector<vector<double>> data, vector<string> date)
                 order_stats.push_back(v);
             }
         }
-        // cout<<date[idx]<<"->"<<cash_transaction<<endl;
         cashflow.push_back(make_pair(date[idx], cash_transaction));
     }
 
     double total_profit = 0;
 
     total_profit = cash_transaction + (position * data.back()[0]);
-    // cout << total_profit << endl;
 
     Statistics ans;
     ans.daily_cashflow = cashflow;

@@ -15,10 +15,6 @@ void MACD::parse_args(std::vector<std::string> &args)
     x = stoi(args[1]);
     start = args[2];
     end = args[3];
-    cout << "symbol " << symbol << endl;
-    cout << "x " << x << endl;
-    cout << "start " << start << endl;
-    cout << "end " << end << endl;
 }
 
 void MACD::get_data()
@@ -69,7 +65,6 @@ Statistics MACD::macd(vector<double> close_price, vector<string> date, int x)
             {
                 cash_transaction = cash_transaction - close_price[idx];
                 position++;
-                // cout << position << endl;
 
                 vector<string> v = {date[idx], "BUY", "1", to_string(close_price[idx])};
                 order_stats.push_back(v);
@@ -81,7 +76,6 @@ Statistics MACD::macd(vector<double> close_price, vector<string> date, int x)
             {
                 cash_transaction = cash_transaction + close_price[idx];
                 position--;
-                // cout << position << endl;
 
                 vector<string> v = {date[idx], "SELL", "1", to_string(close_price[idx])};
                 order_stats.push_back(v);
@@ -92,14 +86,12 @@ Statistics MACD::macd(vector<double> close_price, vector<string> date, int x)
     }
     double total_profit = 0;
     total_profit = cash_transaction + (position * close_price.back());
-    // cout << total_profit << endl;
 
     Statistics ans;
     ans.daily_cashflow = cashflow;
     ans.final_pnl = total_profit;
     ans.order_statistics = order_stats;
 
-    cout << total_profit << endl;
     return ans;
 }
 
