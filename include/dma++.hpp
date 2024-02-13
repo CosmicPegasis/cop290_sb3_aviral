@@ -40,15 +40,15 @@ class DMAPlusPlus : public Strategy
 
     void get_data()
     {
-        std::string command =
-            "python3 api.py DMA++ " + symbol + " " + std::to_string(n) + " " + start + " " + end + " dmaplusplus.csv";
+        std::string command = "python3 api.py DMA++ " + symbol + " " + std::to_string(n - 1) + " " + start + " " + end +
+                              " dmaplusplus.csv";
         system(command.c_str());
         ClosePriceParser csv("dmaplusplus.csv");
         this->dates = csv.get_dates();
         this->close_prices = csv.get_close_price();
     }
 
-    Statistics get_stats(vector<vector<double>> close_price, vector<string> dates)
+    Statistics get_stats(vector<vector<double>> data, vector<string> dates)
     {
         vector<pair<string, double>> cashflow;
         vector<vector<string>> order_stats;
@@ -58,8 +58,8 @@ class DMAPlusPlus : public Strategy
         vector<int> days_monitor;
         int idx = n - 1;
         double SF = 0.5;
-        double AMA = close_price[idx][0];
-        while (idx < close_price.size())
+        double AMA = data[idx][0];
+        while (idx < data.size())
         {
 
             for (int i = 0; i < days_monitor.size(); i++)
@@ -69,16 +69,16 @@ class DMAPlusPlus : public Strategy
             double absolute_change = 0;
             for (int i = idx - n + 2; i <= idx; i++)
             {
-                if (close_price[i][0] - close_price[i - 1][0] >= 0)
+                if (data[i][0] - data[i - 1][0] >= 0)
                 {
-                    absolute_change += close_price[i][0] - close_price[i - 1][0];
+                    absolute_change += data[i][0] - data[i - 1][0];
                 }
                 else
                 {
-                    absolute_change += close_price[i - 1][0] - close_price[i][0];
+                    absolute_change += data[i - 1][0] - data[i][0];
                 }
             }
-            double ER = close_price[idx][0] - close_price[idx + 1 - n][0];
+            double ER = data[idx][0] - data[idx + 1 - n][0];
             bool flag = false;
 
             if (absolute_change == 0)
@@ -90,12 +90,12 @@ class DMAPlusPlus : public Strategy
                 ER = ER / absolute_change;
             }
 
-            // cout << ER << "->" << dates[idx] << endl;
+            ////cout<<ER<<"->"<<date[idx]<<endl;
             double num = double(2 * ER) / double(1 + c2);
             if (idx == n - 1)
             {
                 SF = 0.5;
-                AMA = close_price[idx][0];
+                AMA = data[idx][0];
             }
             else
             {
@@ -107,130 +107,170 @@ class DMAPlusPlus : public Strategy
                 {
                     SF = SF + (c1 * ((double(num - 1) / double(num + 1)) - SF));
                 }
-                AMA = AMA + (SF * (close_price[idx][0] - AMA));
+                AMA = AMA + (SF * (data[idx][0] - AMA));
             }
             string s = "none";
-            // cout << dates[idx][0] << "->" << SF << "->" << AMA << endl;
+            cout << dates[idx] << "->" << SF << "->" << AMA << endl;
             if (days_monitor.size() > 0)
             {
+                for (int i = 0; i < days_monitor.size(); i++)
+                {
+                    cout << days_monitor[i] << " ";
+                }
+                cout << endl;
                 if (days_monitor[0] >= max_hold_days)
                 {
+
                     if (position > 0)
                     {
                         s = "sell";
-                        cash_transaction = cash_transaction + close_price[idx][0];
+                        cash_transaction = cash_transaction + data[idx][0];
                         days_monitor.erase(days_monitor.begin() + 0);
                         position--;
-                        // cout << "SELLO" << endl;
-                        // cout << position << endl;
-                        cashflow.push_back(make_pair(dates[idx], cash_transaction));
-                        vector<string> v = {dates[idx], "SELL", "1", to_string(close_price[idx][0])};
+                        cout << "SELLO" << endl;
+                        cout << position << endl;
+
+                        vector<string> v = {dates[idx], "SELL", "1", to_string(data[idx][0])};
                         order_stats.push_back(v);
                     }
                     else
                     {
                         s = "buy";
-                        cash_transaction = cash_transaction - close_price[idx][0];
-                        // cout << days_monitor.size() << endl;
+                        cash_transaction = cash_transaction - data[idx][0];
+                        ////cout<<days_monitor.size()<<endl;
                         days_monitor.erase(days_monitor.begin() + 0);
-                        // cout << "BUYO" << endl;
+                        cout << "BUYO" << endl;
                         position++;
-                        // cout << position << endl;
-                        cashflow.push_back(make_pair(dates[idx], cash_transaction));
-                        vector<string> v = {dates[idx], "BUY", "1", to_string(close_price[idx][0])};
+                        cout << position << endl;
+
+                        vector<string> v = {dates[idx], "BUY", "1", to_string(data[idx][0])};
                         order_stats.push_back(v);
                     }
                 }
             }
 
-            if (close_price[idx][0] > AMA + ((AMA * p) / double(100)))
+            if (absolute_change != 0)
             {
-                if (position < x)
+                if (data[idx][0] > AMA + ((AMA * p) / double(100)))
                 {
-                    if (s == "none")
+                    if (position < x)
                     {
-                        cash_transaction = cash_transaction - close_price[idx][0];
-                        if (position < 0)
+                        if (s == "none")
                         {
-                            days_monitor.erase(days_monitor.begin() + 0);
+                            cash_transaction = cash_transaction - data[idx][0];
+                            if (position < 0)
+                            {
+                                days_monitor.erase(days_monitor.begin() + 0);
+                            }
+                            else
+                            {
+                                days_monitor.push_back(0);
+                            }
+                            position++;
+                            /// cout << position << endl;
+
+                            vector<string> v = {dates[idx], "BUY", "1", to_string(data[idx][0])};
+                            order_stats.push_back(v);
                         }
-                        else
+                        else if (s == "sell")
                         {
-                            days_monitor.push_back(0);
+                            cash_transaction = cash_transaction - data[idx][0];
+                            if (position < 0)
+                            {
+                                days_monitor.erase(days_monitor.begin() + 0);
+                            }
+                            else
+                            {
+                                days_monitor.push_back(0);
+                            }
+                            order_stats.pop_back();
+                            position++;
+                            ////////cout << position << endl;
                         }
-                        position++;
-                        // cout << position << endl;
-                        cashflow.push_back(make_pair(dates[idx], cash_transaction));
-                        vector<string> v = {dates[idx], "BUY", "1", to_string(close_price[idx][0])};
-                        order_stats.push_back(v);
-                    }
-                    else if (s == "sell")
-                    {
-                        cash_transaction = cash_transaction - close_price[idx][0];
-                        if (position < 0)
+                        else if (s == "buy")
                         {
-                            days_monitor.erase(days_monitor.begin() + 0);
+                            cash_transaction = cash_transaction - data[idx][0];
+                            if (position < 0)
+                            {
+                                days_monitor.erase(days_monitor.begin() + 0);
+                            }
+                            else
+                            {
+                                days_monitor.push_back(0);
+                            }
+                            position++;
+                            order_stats.back()[2] = "2";
                         }
-                        else
-                        {
-                            days_monitor.push_back(0);
-                        }
-                        position++;
-                        // cout << position << endl;
-                    }
-                    else if (s == "buy")
-                    {
-                        ;
                     }
                 }
-            }
-            else if (close_price[idx][0] < AMA - ((AMA * p) / double(100)))
-            {
-                if (position > -x)
+                else if (data[idx][0] < AMA - ((AMA * p) / double(100)))
                 {
-                    if (s == "none")
+                    if (position > -x)
                     {
-                        cash_transaction = cash_transaction + close_price[idx][0];
-                        if (position > 0)
+                        if (s == "none")
                         {
-                            days_monitor.erase(days_monitor.begin() + 0);
+                            cash_transaction = cash_transaction + data[idx][0];
+                            if (position > 0)
+                            {
+                                days_monitor.erase(days_monitor.begin() + 0);
+                            }
+                            else
+                            {
+                                days_monitor.push_back(0);
+                            }
+                            position--;
+                            //////cout << position << endl;
+
+                            vector<string> v = {dates[idx], "SELL", "1", to_string(data[idx][0])};
+                            order_stats.push_back(v);
                         }
-                        else
+                        else if (s == "buy")
                         {
-                            days_monitor.push_back(0);
+                            cash_transaction = cash_transaction + data[idx][0];
+                            if (position > 0)
+                            {
+                                days_monitor.erase(days_monitor.begin() + 0);
+                            }
+                            else
+                            {
+                                days_monitor.push_back(0);
+                            }
+                            order_stats.pop_back();
+                            position--;
+                            ////cout << position << endl;
                         }
-                        position--;
-                        // cout << position << endl;
-                        cashflow.push_back(make_pair(dates[idx], cash_transaction));
-                        vector<string> v = {dates[idx], "SELL", "1", to_string(close_price[idx][0])};
-                        order_stats.push_back(v);
+                        else if (s == "sell")
+                        {
+                            cash_transaction = cash_transaction + data[idx][0];
+                            if (position > 0)
+                            {
+                                days_monitor.erase(days_monitor.begin() + 0);
+                            }
+                            else
+                            {
+                                days_monitor.push_back(0);
+                            }
+                            position--;
+                            order_stats.back()[2] = "2";
+                        }
                     }
-                    else if (s == "buy")
-                    {
-                        cash_transaction = cash_transaction + close_price[idx][0];
-                        if (position > 0)
-                        {
-                            days_monitor.erase(days_monitor.begin() + 0);
-                        }
-                        else
-                        {
-                            days_monitor.push_back(0);
-                        }
-                        position--;
-                        // cout << position << endl;
-                    }
-                    else if (s == "sell")
-                    {
-                        ;
-                    }
+                    // cout<<position<<endl;
                 }
             }
 
+            cout << position << endl;
+            cashflow.push_back(make_pair(dates[idx], cash_transaction));
             idx++;
         }
 
-        total_profit = cash_transaction + (position * close_price.back()[0]);
-        // cout << total_profit << endl;
+        total_profit = cash_transaction + (position * data.back()[0]);
+        ////cout << total_profit << endl;
+
+        for (int i = 0; i < order_stats.size(); i++)
+        {
+            cout << order_stats[i][0] << "->" << order_stats[i][1] << "->" << order_stats[i][2] << "->"
+                 << order_stats[i][3] << endl;
+        }
 
         Statistics ans;
         ans.daily_cashflow = cashflow;
@@ -257,6 +297,6 @@ class DMAPlusPlus : public Strategy
     };
     ~DMAPlusPlus()
     {
-        remove("dmaplusplus.csv");
+        // remove("dmaplusplus.csv");
     }
 };
