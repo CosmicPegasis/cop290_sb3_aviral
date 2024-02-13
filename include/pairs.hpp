@@ -57,83 +57,73 @@ class Pairs : public Strategy
 
     Statistics get_stats()
     {
-        vector<pair<string, double>> cashflow;
-        vector<vector<string>> order_stats;
-        vector<vector<string>> order_stats1;
-
-        int idx;
-        double total_profit = 0;
+    vector<pair<string, double>> cashflow;
+    vector<vector<string>> order_stats;
+    vector<vector<string>> order_stats1;
+    
+    
+    double total_profit = 0;
+    
+    
+    int position = 0;
+    double cash_transaction =0;
+    
+    for(int idx=n;idx<data.size();idx++){
+        cout<<dates[idx]<<"->"<<order_stats1.size()<<"->"<<order_stats.size()<<endl;
         double sum = 0;
         double sum_sq = 0;
-        int position = 0;
-        double cash_transaction = 0;
-        for (idx = 0; idx < n - 1; idx++)
-        {
-            sum = sum + data[idx][0] - data[idx][1];
-            sum_sq = sum_sq + ((data[idx][0] - data[idx][1]) * (data[idx][0] - data[idx][1]));
+        for(int i=idx+1-n;i<=idx;i++){
+            sum = sum+data[i][0]-data[i][1];
+            sum_sq = sum_sq+((data[i][0]-data[i][1])*(data[i][0]-data[i][1]));
         }
-        cout << sum << endl;
-        cout << data[idx][0] - data[idx][1] << endl;
-        cout << sum + data[idx][0] - data[idx][1] << endl;
-        int upper = idx;
-        int lower = 0;
-        while (upper < data.size())
-        {
-            sum = sum + data[upper][0] - data[upper][1];
-            sum_sq = sum_sq + ((data[upper][0] - data[upper][1]) * (data[upper][0] - data[upper][1]));
+        double mean = (sum/(double(n)));
+        double sd = sqrt((sum_sq/double(n))-(mean * mean));
 
-            double mean = sum / double(n); // Assuming st-0 is in data[0] and st-1 is in data[1]
-            double sd = sqrt(((sum_sq) / double(n)) - (mean * mean));
-            double spread = data[upper][0] - data[upper][1];
-            double z_score = (spread - mean) / sd;
-            cout << dates[upper] << "->" << z_score << "->" << threshold << " " << mean << " " << sd << endl;
-            if (z_score > threshold)
-            {
-                if (position > -x)
-                {
-                    cash_transaction = cash_transaction + data[upper][0] - data[upper][1];
-                    position--;
-                    cout << position << endl;
-                    cashflow.push_back(make_pair(dates[upper], cash_transaction));
-                    vector<string> v = {dates[upper], "SELL", "1", to_string(data[upper][0])};
-                    order_stats.push_back(v);
-                    vector<string> v1 = {dates[upper], "BUY", "1", to_string(data[upper][1])};
-                    order_stats1.push_back(v1);
-                }
+        double z_score = ((data[idx][0]-data[idx][1])-mean)/sd;
+        //cout<<dates[idx]<<"->"<<z_score<<"->"<<sd<<"->"<<mean<<endl;
+        if(z_score < -threshold ){
+            if(position < x){
+                cash_transaction = cash_transaction - data[idx][0]+data[idx][1];
+                position++;
+                vector<string> v = {dates[idx], "BUY", "1", to_string(data[idx][0])};
+                order_stats.push_back(v);
+                vector<string> v1 = {dates[idx],"SELL","1",to_string(data[idx][1])};
+                order_stats1.push_back(v1);
             }
-            else if (z_score < -threshold)
-            {
-                if (position < x)
-                {
-                    cash_transaction = cash_transaction + data[upper][1] - data[upper][0];
-                    position++;
-                    cout << position << endl;
-                    cashflow.push_back(make_pair(dates[upper], cash_transaction));
-                    vector<string> v = {dates[upper], "BUY", "1", to_string(data[upper][0])};
-                    order_stats.push_back(v);
-                    vector<string> v1 = {dates[upper], "SELL", "1", to_string(data[upper][1])};
-                    order_stats1.push_back(v1);
-                }
+        }
+        if(z_score > threshold){
+            if(position > -x){
+                cash_transaction = cash_transaction + data[idx][0]-data[idx][1];
+                position--;
+                vector<string> v = {dates[idx], "SELL", "1", to_string(data[idx][0])};
+                order_stats.push_back(v);
+                vector<string> v1 = {dates[idx], "BUY", "1", to_string(data[idx][1])};
+                order_stats1.push_back(v1);
             }
-
-            sum = sum - (data[lower][0] - data[lower][1]);
-
-            sum_sq = sum_sq - ((data[lower][0] - data[lower][1]) * (data[lower][0] - data[lower][1]));
-            lower++;
-            upper++;
         }
 
-        total_profit = cash_transaction + (position * (data.back()[0] - data.back()[1]));
-        // cout << total_profit << endl;
+        cashflow.push_back(make_pair(dates[idx],cash_transaction));
+    }
+    //cout << total_profit << endl;
 
-        Statistics ans;
-        ans.daily_cashflow = cashflow;
-        ans.final_pnl = total_profit;
-        ans.order_statistics = order_stats;
-        ans.order_statistics2 = order_stats1;
-
-        cout << total_profit << endl;
-        return ans;
+    total_profit = cash_transaction+(position*(data.back()[0]-data.back()[1]));
+    Statistics ans;
+    ans.daily_cashflow = cashflow;
+    ans.final_pnl = total_profit;
+    ans.order_statistics = order_stats;
+    ans.order_statistics2 = order_stats1;
+    cout<<"==============="<<endl;
+    for(int i=0;i<order_stats.size();i++){
+         cout<<order_stats[i][0]<<"->"<<order_stats[i][1]<<" "<<order_stats[i][2]<<" "<<order_stats[i][3]<<endl;
+    }
+    cout<<"================"<<endl;
+    for(int i=0;i<order_stats1.size();i++){
+        cout<<order_stats1[i][0]<<"->"<<order_stats1[i][1]<<" "<<order_stats1[i][2]<<" "<<order_stats1[i][3]<<endl;
+    }
+    cout<<"================"<<endl;
+    cout<<order_stats1.size()<<" "<<order_stats.size()<<endl;
+    cout << total_profit << endl;
+    return ans;
     }
 
   public:
