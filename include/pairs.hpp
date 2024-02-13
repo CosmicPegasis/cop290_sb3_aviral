@@ -1,6 +1,7 @@
 #include <iostream>
 #include <strategy.hpp>
 
+#pragma once
 class Pairs : public Strategy
 {
     std::string symbol1, symbol2, start, end;
