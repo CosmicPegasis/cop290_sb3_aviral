@@ -19,6 +19,7 @@ int main(int argc, char **argv)
     {
         CSVWriter order_statistics("order_statistics_1.csv");
         CSVWriter order_statistics2("order_statistics_2.csv");
+        order_statistics.write(choose.get_orders());
         order_statistics2.write(choose.get_orders2());
     }
     else
