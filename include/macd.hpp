@@ -36,102 +36,6 @@ class MACD : public Strategy
         this->close_prices = csv.get_close_price();
     }
 
-    void get_ewm(vector<double> &ewm_list, vector<double> prices, double aplha)
-    {
-        ewm_list = {prices[0]};
-        for (int i = 1; i < prices.size(); i++)
-        {
-            double ewm = aplha * (prices[i] - ewm_list.back()) + ewm_list.back();
-            ewm_list.push_back(ewm);
-        }
-    }
-
-    string macd_strategy(vector<double> close_price)
-    {
-        double short_ewm_alpha = double(2) / double(12 + 1);
-        double long_ewm_alpha = double(2) / double(26 + 1);
-        double signal_line_alpha = double(2) / double(9 + 1);
-        vector<double> short_ewm;
-        vector<double> long_ewm;
-        vector<double> macd_vector(9);
-        vector<double> signal_line;
-        int idx = 34;
-        vector<double> price_12days(close_price.begin() + idx - 12, close_price.begin() + idx);
-        // //cout << "past12days ";
-
-        for (int i = 0; i < price_12days.size(); i++)
-        {
-            // //cout << price_12days[i] << " ";
-        }
-
-        // //cout << endl;
-
-        get_ewm(short_ewm, price_12days, short_ewm_alpha);
-
-        vector<double> price_26days(close_price.begin() + idx - 26, close_price.begin() + idx);
-
-        get_ewm(long_ewm, price_26days, long_ewm_alpha);
-        // cout << "past26days ";
-
-        for (int i = 0; i < price_26days.size(); i++)
-        {
-            // cout << price_26days[i] << " ";
-        }
-
-        // cout << endl;
-        // cout << "short_ewm";
-        for (int i = 0; i < short_ewm.size(); i++)
-        {
-            // cout << short_ewm[i] << " ";
-        }
-        // cout << endl;
-        // cout << "long_ewm" << endl;
-        for (int i = 0; i < long_ewm.size(); i++)
-        {
-            // cout << long_ewm[i] << " ";
-        }
-        // cout << endl;
-
-        double macd = short_ewm.back() - long_ewm.back();
-        idx = 34;
-
-        for (int i = 0; i < 9; i++)
-        {
-            vector<double> price_12days(close_price.begin() + idx - 12, close_price.begin() + idx);
-            get_ewm(short_ewm, price_12days, short_ewm_alpha);
-            vector<double> price_26days(close_price.begin() + idx - 26, close_price.begin() + idx);
-            get_ewm(long_ewm, price_26days, long_ewm_alpha);
-            double macd_helper = short_ewm.back() - long_ewm.back();
-            macd_vector[9 - i - 1] = macd_helper;
-            idx--;
-        }
-        // calculate_macd(short_ewm, long_ewm, macd_vector);
-        // cout << "macd_vector ";
-        for (int i = 0; i < macd_vector.size(); i++)
-        {
-            // cout << macd_vector[i] << " ";
-        }
-        // cout << endl;
-        get_ewm(signal_line, macd_vector, signal_line_alpha);
-
-        // cout << "signal_line" << endl;
-        for (int i = 0; i < signal_line.size(); i++)
-        {
-            // cout << signal_line[i] << " ";
-        }
-        // cout << endl;
-
-        if (macd > signal_line.back())
-        {
-            // cout << "BUY" << endl;
-            return "BUY";
-        }
-        else
-        {
-            // cout << "SELL" << endl;
-            return "SELL";
-        }
-    }
     Statistics macd(vector<double> close_price, vector<string> date, int x)
     {
 
@@ -140,50 +44,68 @@ class MACD : public Strategy
         int position = 0;
         int idx;
         double cash_transaction = 0;
-        for (idx = 33; idx < close_price.size(); idx++)
-        {
-            // cout << date[idx] << " ";
+        double MACD = 0;
+        double short_ewm = 0;
+        double long_ewm = 0;
+        double short_ewm_alpha = double(2) / double(12 + 1);
+        double long_ewm_alpha = double(2) / double(26 + 1);
+        double signal_line_alpha = double(2) / double(9 + 1);
+        double signal = 0;
 
-            vector<double> v;
-            for (int i = idx - 33; i <= idx; i++)
+        for (idx = 34; idx < close_price.size(); idx++)
+        {
+            if (idx == 34)
             {
-                v.push_back(close_price[i]);
+                short_ewm = close_price[idx];
+                long_ewm = close_price[idx];
+                MACD = short_ewm - long_ewm;
+                signal = MACD;
             }
-            if (macd_strategy(v) == "BUY")
+            else
+            {
+                short_ewm = short_ewm + (short_ewm_alpha * (close_price[idx] - short_ewm));
+                long_ewm = long_ewm + (long_ewm_alpha * (close_price[idx] - long_ewm));
+                MACD = short_ewm - long_ewm;
+                signal = signal + (signal_line_alpha * (MACD - signal));
+            }
+
+            if (MACD > signal)
             {
                 if (position < x)
                 {
                     cash_transaction = cash_transaction - close_price[idx];
                     position++;
                     // cout << position << endl;
-                    cashflow.push_back(make_pair(date[idx], cash_transaction));
+
                     vector<string> v = {date[idx], "BUY", "1", to_string(close_price[idx])};
                     order_stats.push_back(v);
                 }
             }
-            else
+            if (MACD < signal)
             {
                 if (position > -x)
                 {
                     cash_transaction = cash_transaction + close_price[idx];
                     position--;
                     // cout << position << endl;
-                    cashflow.push_back(make_pair(date[idx], cash_transaction));
+
                     vector<string> v = {date[idx], "SELL", "1", to_string(close_price[idx])};
                     order_stats.push_back(v);
                 }
             }
+
+            cashflow.push_back(make_pair(date[idx], cash_transaction));
         }
         double total_profit = 0;
         total_profit = cash_transaction + (position * close_price.back());
-        // //cout << total_profit << endl;
+        // cout << total_profit << endl;
 
         Statistics ans;
         ans.daily_cashflow = cashflow;
         ans.final_pnl = total_profit;
         ans.order_statistics = order_stats;
 
-        // cout << total_profit << endl;
+        cout << total_profit << endl;
         return ans;
     }
 
