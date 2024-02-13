@@ -85,7 +85,10 @@ The strategy calculates the rolling mean and rolling standard deviation of the s
 
  ### 10. Stop-Loss in Pairs Trading Strategy
 
- ##### INSIGHTS
+##### HOW IT WORKS 
+The strategy is same as the pair_trading strategy (strategy-9) but here we put an additional constraint that if z_score of a particular position crosses the stop_threshold then we close that position. Also, if we have a positive position and if a sell signal is generated then we sell that stock which we bought earlier. Similarly, for short-selling we buy that stock which we sold earlier. Also to calcualte the z_score for checking if it crosses the max_hold_days, we use the original mean and standard deviation at which the position was opened.
+
+##### INSIGHTS
 The inclusion of a stop-loss based constraint in the pairs trading strategy enhances risk management capabilities. By setting a stop-loss threshold, traders can mitigate potential losses by automatically closing positions when the spread deviates beyond an acceptable level. 
 This proactive approach helps limit downside risk and preserves capital in volatile market conditions.
 By monitoring the movement of the z-score, which reflects deviations from the expected mean, the strategy identifies unfavorable trends and takes prompt action to exit positions, thereby minimizing exposure to adverse market movements.
