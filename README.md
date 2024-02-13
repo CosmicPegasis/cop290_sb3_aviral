@@ -1,4 +1,4 @@
-# COP290: ASSIGNMENT 1
+# COP290: ASSIGNMENT 1 - SUB-3
 
 ## STOCK TRADING STRATEGIES
 
@@ -89,4 +89,12 @@ The strategy calculates the rolling mean and rolling standard deviation of the s
 The inclusion of a stop-loss based constraint in the pairs trading strategy enhances risk management capabilities. By setting a stop-loss threshold, traders can mitigate potential losses by automatically closing positions when the spread deviates beyond an acceptable level. 
 This proactive approach helps limit downside risk and preserves capital in volatile market conditions.
 By monitoring the movement of the z-score, which reflects deviations from the expected mean, the strategy identifies unfavorable trends and takes prompt action to exit positions, thereby minimizing exposure to adverse market movements.
-The strategy offers flexibility through configurable parameters such as stop_loss_threshold, allowing traders to tailor the stop-loss mechanism to their risk tolerance and trading preferences. 
+The strategy offers flexibility through configurable parameters such as stop_loss_threshold, allowing traders to tailor the stop-loss mechanism to their risk tolerance and trading preferences.
+
+
+### GRAPHS
+Note that the parameter for prediction are taken same as given in the assignment file, unless mentioned.
+
+##### 1. BASIC
+![Screenshot 2024-02-13 170928](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/bb947adf-4120-43ad-acc8-03735174082c)
+
