@@ -1,9 +1,6 @@
 #include "strategy.hpp"
-#include <cmath>
-#include <iostream>
 
 #pragma once
-using namespace std;
 class DMA : public Strategy
 {
     int n, x, p;

@@ -1,6 +1,4 @@
 #include "strategy.hpp"
-#include <string>
-#include <vector>
 
 #pragma once
 class RSI : public Strategy

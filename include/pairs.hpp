@@ -1,5 +1,4 @@
-#include <iostream>
-#include <strategy.hpp>
+#include "strategy.hpp"
 
 #pragma once
 class Pairs : public Strategy

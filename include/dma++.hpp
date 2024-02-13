@@ -1,6 +1,4 @@
 #include "strategy.hpp"
-#include <cmath>
-#include <iostream>
 
 #pragma once
 class DMAPlusPlus : public Strategy

@@ -1,8 +1,4 @@
-#include "pairs.hpp"
 #include "strategy.hpp"
-#include <stdexcept>
-#include <string>
-#include <vector>
 #pragma once
 
 class StrategyChooser

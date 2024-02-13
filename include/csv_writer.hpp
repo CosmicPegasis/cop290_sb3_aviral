@@ -1,5 +1,4 @@
 #include <fstream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 #pragma once

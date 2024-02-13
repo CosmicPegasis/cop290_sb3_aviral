@@ -1,5 +1,4 @@
 #include "strategy.hpp"
-#include <iostream>
 
 #pragma once
 class PairsSL : public Strategy

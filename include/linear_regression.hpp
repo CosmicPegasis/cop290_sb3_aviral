@@ -1,6 +1,4 @@
 #include "strategy.hpp"
-#include <iostream>
-#include <vector>
 
 #pragma once
 class LinearRegressionCore
