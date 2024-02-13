@@ -64,8 +64,7 @@ Statistics RSI::get_stats(vector<vector<double>> data, vector<string> date)
             {
                 cash_transaction = cash_transaction - data[upper][0];
                 position++;
-
-                vector<string> v = {date[upper], "SELL", "1", to_string(data[upper][0])};
+                vector<string> v = {date[upper], "BUY", "1", to_string(data[upper][0])};
                 order_stats.push_back(v);
             }
         }
@@ -75,8 +74,6 @@ Statistics RSI::get_stats(vector<vector<double>> data, vector<string> date)
             {
                 cash_transaction = cash_transaction + data[upper][0];
                 position--;
-                //cout << position << endl;
-                
                 vector<string> v = {date[upper], "SELL", "1", to_string(data[upper][0])};
                 order_stats.push_back(v);
             }
