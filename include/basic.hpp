@@ -36,87 +36,59 @@ class Basic : public Strategy
     Statistics get_stats(vector<vector<double>> data, vector<string> date)
     {
         vector<pair<string, double>> cashflow;
-        vector<vector<string>> order_stats;
-        int idx;
-        int collecter = 0;
-        int position = 0;
-        double cash_transaction = 0;
-        for (idx = 1; idx <= n; idx++)
-        {
-            if (data[idx][0] >= data[idx - 1][0])
-            {
-                collecter++;
-                data[idx][1] = 1;
+    vector<vector<string>> order_stats;
+    int idx;
+    int collecter = 0;
+    int position = 0;
+    double cash_transaction = 0;
+    //cout<<"Function call"<<endl;
+    
+    for(int idx=n;idx<data.size();idx++){
+        bool inc = true;
+        bool dec = true;
+        for(int i=idx-n+1;i<=idx;i++){
+            if(data[i][0] > data[i-1][0]){
+                dec = false;
             }
-            else
-            {
-                collecter--;
-                data[idx][1] = -1;
+            if(data[i][0] < data[i-1][0]){
+                inc = false;
+            }
+            if(data[i][0] == data[i-1][0]){
+                inc = false;
+                dec = false;
             }
         }
 
-        int lower = 0;
-        int upper = idx - 1;
-        while (upper < data.size())
-        {
-            if (collecter == n)
-            {
-                if (position < x)
-                {
-                    cash_transaction = cash_transaction - data[upper][0];
-                    position++;
-                    // cout << position << endl;
-                    // cashflow.push_back(make_pair(date[upper], cash_transaction));
-                    vector<string> v = {date[upper], "BUY", "1", to_string(data[upper][0])};
-                    order_stats.push_back(v);
-                }
+        if(inc){
+            if(position < x){
+                cash_transaction = cash_transaction - data[idx][0];
+                position++;
+                vector<string> v = {date[idx], "BUY", "1", to_string(data[idx][0])};
+                order_stats.push_back(v);
             }
-            else if (collecter == -n)
-            {
-                if (position > -x)
-                {
-                    cash_transaction = cash_transaction + data[upper][0];
-                    position--;
-                    // cout << position << endl;
-                    // cashflow.push_back(make_pair(date[upper], cash_transaction));
-                    vector<string> v = {date[upper], "SELL", "1", to_string(data[upper][0])};
-                    order_stats.push_back(v);
-                }
-            }
-            if (upper == data.size() - 1)
-            {
-                ;
-            }
-            else
-            {
-                if (data[upper + 1][0] >= data[upper][0])
-                {
-
-                    data[upper + 1][1] = 1;
-                }
-                else
-                {
-
-                    data[upper + 1][1] = -1;
-                }
-
-                collecter = collecter + data[upper + 1][1];
-
-                collecter = collecter - data[lower + 1][1];
-            }
-            cashflow.push_back(make_pair(date[upper], cash_transaction));
-            upper++;
-            lower++;
         }
-        double total_profit = 0;
+        if(dec){
+            if(position > -x){
+                cash_transaction = cash_transaction + data[idx][0];
+                position--;
+                vector<string> v = {date[idx], "SELL", "1", to_string(data[idx][0])};
+                order_stats.push_back(v);
+            }
+        }
+        //cout<<date[idx]<<"->"<<cash_transaction<<endl;
+        cashflow.push_back(make_pair(date[idx],cash_transaction));
+    }
+    
+    double total_profit = 0;
+    
+    total_profit = cash_transaction + (position * data.back()[0]);
+    //cout << total_profit << endl;
 
-        total_profit = cash_transaction + (position * data.back()[0]);
-
-        Statistics ans;
-        ans.daily_cashflow = cashflow;
-        ans.final_pnl = total_profit;
-        ans.order_statistics = order_stats;
-        return ans;
+    Statistics ans;
+    ans.daily_cashflow = cashflow;
+    ans.final_pnl = total_profit;
+    ans.order_statistics = order_stats;
+    return ans;
     }
 
   public:
