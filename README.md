@@ -101,4 +101,21 @@ Note that the parameter for prediction are same as given in the assignment file,
 ##### 2. DMA
 ![Screenshot 2024-02-13 170831](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/ae9b5beb-5f0f-4ffb-b2fd-645bef4c8b93)
 
+##### 3. DMA++
+![Screenshot 2024-02-13 171439](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/f2f9952b-1376-4aea-9eea-b1f5004c23ab)
+
+##### 4. MACD
+![Screenshot 2024-02-13 171740](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/5be5b936-53b7-48cf-98ab-108afddb0e21)
+
+##### 5. RSI
+![Screenshot 2024-02-13 172356](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/1745e146-8cfc-414e-b035-3a2ce887a519)
+
+##### 6. ADX
+![Screenshot 2024-02-13 172936](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/0b838d0d-31f3-4b29-b628-80be9481fc6d)
+
+##### 7. PAIRS
+![Screenshot 2024-02-13 173351](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/0706305d-6716-4a53-88e4-0bea5e1fd53a)
+
+##### 8. PAIRS_STOP_LOSS
+![Screenshot 2024-02-13 173848](https://github.com/CosmicPegasis/cop290_sb3_aviral/assets/146637932/dcdc22a3-a82e-46a2-ae0a-eec0781aa2d9)
 
