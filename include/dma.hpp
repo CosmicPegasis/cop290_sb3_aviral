@@ -39,86 +39,88 @@ class DMA : public Strategy
         this->close_prices = csv.get_close_price();
     }
 
-    Statistics get_stats(std::vector<std::vector<double>> close_price, std::vector<std::string> dates)
+    Statistics get_stats(std::vector<std::vector<double>> data, std::vector<std::string> date)
     {
 
-        std::vector<std::pair<std::string, double>> cashflow;
-        std::vector<std::vector<std::string>> order_stats;
-        double total_profit = 0;
-        double sum = 0;
-        double sum_sq = 0;
-        int idx;
-        int position = 0;
-        double cash_transaction = 0;
+        vector<pair<string, double>> cashflow;
+    vector<vector<string>> order_stats;
+    double total_profit = 0;
+    double sum = 0;
+    double sum_sq = 0;
+    int idx;
+    int position = 0;
+    double cash_transaction = 0;
 
-        for (idx = 0; idx < n; idx++)
+    for (idx = 1; idx <= n; idx++)
+    {
+
+        sum = sum + data[idx][0];
+        sum_sq = sum_sq + (data[idx][0] * data[idx][0]);
+    }
+
+    int upper = idx-1;
+    int lower = 1;
+
+    while (upper < data.size())
+    {
+        double mean = sum / double(n);
+        double sd = sqrt(((sum_sq) / double(n)) - (mean * mean));
+        //cout << date[upper] << " " << data[upper][0] - mean << "->" << mean << " " << sd << " " << p * sd << " " << data[upper][0] << endl;
+
+        if (data[upper][0] >= mean + (p * sd))
         {
 
-            sum = sum + close_price[idx][0];
-            sum_sq = sum_sq + (close_price[idx][0] * close_price[idx][0]);
+            if (position < x)
+            {
+                cash_transaction = cash_transaction - data[upper][0];
+                position++;
+                //cout << position << endl;
+                
+                vector<string> v = {date[upper], "BUY", "1", to_string(data[upper][0])};
+                order_stats.push_back(v);
+            }
         }
-
-        int upper = idx;
-        int lower = 0;
-
-        while (upper < close_price.size())
+        else if (mean >= data[upper][0] + (p * sd))
         {
-            double mean = sum / double(n);
-            double sd = sqrt(((sum_sq) / double(n)) - (mean * mean));
-            // cout << date[upper] << " " << data[upper][0] - mean << "->" << mean << " " << sd << " " << p * sd << " "
-            // << data[upper][0] << endl;
-
-            if (close_price[upper][0] >= mean + (p * sd))
+            if (position > -x)
             {
-
-                if (position < x)
-                {
-                    cash_transaction = cash_transaction - close_price[upper][0];
-                    position++;
-                    // cout << position << endl;
-                    cashflow.push_back(std::make_pair(dates[upper], cash_transaction));
-                    std::vector<std::string> v = {dates[upper], "BUY", "1", std::to_string(close_price[upper][0])};
-                    order_stats.push_back(v);
-                }
+                cash_transaction = cash_transaction + data[upper][0];
+                position--;
+                //cout << position << endl;
+                
+                vector<string> v = {date[upper], "SELL", "1", to_string(data[upper][0])};
+                order_stats.push_back(v);
             }
-            else if (mean >= close_price[upper][0] + (p * sd))
-            {
-                if (position > -x)
-                {
-                    cash_transaction = cash_transaction + close_price[upper][0];
-                    position--;
-                    // cout << position << endl;
-                    cashflow.push_back(std::make_pair(dates[upper], cash_transaction));
-                    std::vector<std::string> v = {dates[upper], "SELL", "1", std::to_string(close_price[upper][0])};
-                    order_stats.push_back(v);
-                }
-            }
-
-            sum = sum + close_price[upper][0];
-
-            sum_sq = sum_sq + (close_price[upper][0] * close_price[upper][0]);
-
-            sum = sum - close_price[lower][0];
-
-            sum_sq = sum_sq - (close_price[lower][0] * close_price[lower][0]);
-
-            lower++;
-            upper++;
-            // cout << "----------" << endl;
         }
+        cashflow.push_back(make_pair(date[upper], cash_transaction));
+        if(upper !=data.size()-1){
+            sum = sum + data[upper+1][0];
 
-        // double total_profit = 0;
+            sum_sq = sum_sq + (data[upper+1][0] * data[upper+1][0]);
 
-        total_profit = cash_transaction + (position * close_price.back()[0]);
-        // cout << total_profit << endl;
+            sum = sum - data[lower][0];
 
-        Statistics ans;
-        ans.daily_cashflow = cashflow;
-        ans.final_pnl = total_profit;
-        ans.order_statistics = order_stats;
+            sum_sq = sum_sq - (data[lower][0] * data[lower][0]);
+        }
+        
 
-        // cout << total_profit << endl;
-        return ans;
+        lower++;
+        upper++;
+        //cout << "----------" << endl;
+    }
+
+    
+    
+    total_profit = cash_transaction + (position * data.back()[0]);
+    //cout << total_profit << endl;
+
+    Statistics ans;
+    ans.daily_cashflow = cashflow;
+    ans.final_pnl = total_profit;
+    ans.order_statistics = order_stats;
+
+    //cout << total_profit << endl;
+    return ans;
     }
 
   public:
