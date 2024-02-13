@@ -60,14 +60,30 @@ The strategy calculates DM+ and DM- to quantify upward and downward price moveme
 By comparing the current high to the previous high (for DM+) and the current low to the previous low (for DM-), the strategy identifies directional price changes, which are crucial for determining trend strength.
 It helps to filter out short-term fluctuations and identify underlying trends more accurately. 
 
-### 7. Mean-Reverting Pairs Trading Strategy
+### 7. LINEAR REGRESSION
+
+##### OPTIMIZATIONS
+The algorithm using normal equations uses RRE Method to calculate inverses, which runs in O(n^3)
+
+##### INSIGHTS
+Linear Regression is being used to predict the stock price. We're assuming that the stock will behave in a similarly between training dates and the trading dates.
+We might make this assumption, on the basis of some real world events such as IPOs. For example we can train a model on PAYTM's IPO and use to judge new and upcoming fintech IPOs
+which deliver a similar product.
+
+### 8. BEST OF ALL
+
+##### INSIGHTS
+After running all the above algorithms on several different trading intervals, it has become extremely apparent that a single simple algorithm will not suffice over any reasonable
+interval of time. In other words, in most of our testing, the return was grossly negative even for the best of all strategies.
+
+### 9. Mean-Reverting Pairs Trading Strategy
 
 ##### INSIGHTS
 The strategy relies on selecting a pair of stocks that exhibit a strong correlation or cointegration. This ensures that the spread between the prices of the two stocks tends to revert to its mean over time, providing opportunities for profit through mean-reversion trading strategies.
 The strategy calculates the rolling mean and rolling standard deviation of the spread over a specified lookback period. This provides a dynamic measure of the average spread and its variability, allowing for adaptive trading decisions based on recent market conditions.
  A high positive Z-score indicates that the spread is significantly above its mean, suggesting a potential mean-reversion opportunity to sell the spread. Conversely, a low negative Z-score indicates that the spread is significantly below its mean, signaling a potential opportunity to buy the spread.
 
- ### 8. Stop-Loss in Pairs Trading Strategy
+ ### 10. Stop-Loss in Pairs Trading Strategy
 
  ##### INSIGHTS
 The inclusion of a stop-loss based constraint in the pairs trading strategy enhances risk management capabilities. By setting a stop-loss threshold, traders can mitigate potential losses by automatically closing positions when the spread deviates beyond an acceptable level. 

@@ -15,6 +15,10 @@ int main(int argc, char **argv)
     ArgParser arg(argc, argv);
     vector<string> args = arg.get_arguments();
     StrategyChooser choose(args);
+    if (choose.get_strategy_used() == PairsSLStrat)
+    {
+        cout << "hi!";
+    }
     if (choose.get_strategy_used() == PairsStrat || choose.get_strategy_used() == PairsSLStrat)
     {
         CSVWriter order_statistics("order_statistics_1.csv");
