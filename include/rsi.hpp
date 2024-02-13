@@ -44,64 +44,65 @@ class RSI : public Strategy
         this->close_prices = csv.get_close_price();
     }
 
-    Statistics get_stats(vector<vector<double>> close_price, vector<string> dates)
+    Statistics get_stats(vector<vector<double>> data, vector<string> date)
     {
         vector<pair<string, double>> cashflow;
-        vector<vector<string>> order_stats;
-        int idx;
-        int position = 0;
-        double gain = 0;
-        double loss = 0;
-        double total_profit = 0;
-        double cash_transaction = 0;
-        for (idx = 1; idx < n; idx++)
+    vector<vector<string>> order_stats;
+    int idx;
+    int position = 0;
+    double gain = 0;
+    double loss = 0;
+    double total_profit = 0;
+    double cash_transaction = 0;
+    for (idx = 1; idx <= n; idx++)
+    {
+        if (data[idx][0] - data[idx - 1][0] >= 0)
         {
-            if (close_price[idx][0] - close_price[idx - 1][0] >= 0)
+            gain = gain + data[idx][0] - data[idx - 1][0];
+        }
+        else
+        {
+            loss = loss + data[idx - 1][0] - data[idx][0];
+        }
+    }
+    int lower = 0;
+    int upper = idx-1;
+    //cout << upper << endl;
+    //cout << data.size() << endl;
+    while (upper < data.size())
+    {
+        double rs = gain / loss;
+        double rsi = double(100) - double(100) / double(1 + rs);
+
+        if (rsi < oversold)
+        {
+            if (position < x)
             {
-                gain = gain + close_price[idx][0] - close_price[idx - 1][0];
-            }
-            else
-            {
-                loss = loss + close_price[idx - 1][0] - close_price[idx][0];
+                cash_transaction = cash_transaction - data[upper][0];
+                position++;
+                //cout << position << endl;
+                
+                vector<string> v = {date[upper], "BUY", "1", to_string(data[upper][0])};
+                order_stats.push_back(v);
             }
         }
-        int lower = 0;
-        int upper = idx;
-        // cout << upper << endl;
-        // cout << data.size() << endl;
-        while (upper < close_price.size())
+        if (rsi > overbought)
         {
-            double rs = gain / loss;
-            double rsi = double(100) - double(100) / double(1 + rs);
-
-            if (rsi < oversold)
+            if (position > -x)
             {
-                if (position < x)
-                {
-                    cash_transaction = cash_transaction - close_price[upper][0];
-                    position++;
-                    // cout << position << endl;
-                    cashflow.push_back(make_pair(dates[upper], cash_transaction));
-                    vector<string> v = {dates[upper], "BUY", "1", to_string(close_price[upper][0])};
-                    order_stats.push_back(v);
-                }
+                cash_transaction = cash_transaction + data[upper][0];
+                position--;
+                //cout << position << endl;
+                
+                vector<string> v = {date[upper], "SELL", "1", to_string(data[upper][0])};
+                order_stats.push_back(v);
             }
-            if (rsi > overbought)
-            {
-                if (position > -x)
-                {
-                    cash_transaction = cash_transaction + close_price[upper][0];
-                    position--;
-                    // cout << position << endl;
-                    cashflow.push_back(make_pair(dates[upper], cash_transaction));
-                    vector<string> v = {dates[upper], "SELL", "1", to_string(close_price[upper][0])};
-                    order_stats.push_back(v);
-                }
-            }
-            double change1 = close_price[upper][0] - close_price[upper - 1][0];
-            double change2 = close_price[lower + 1][0] - close_price[lower][0];
-            // cout << date[upper] << "->" << rsi << " " << gain << " " << loss << endl;
-            // cout << "change1->" << change1 << "change2->" << change2 << endl;
+        }
+        cashflow.push_back(make_pair(date[upper], cash_transaction));
+        if(upper != data.size()-1){
+            double change1 = data[upper+1][0] - data[upper ][0];
+            double change2 = data[lower + 1][0] - data[lower][0];
+            //cout << "change1->" << change1 << "change2->" << change2 << endl;
             if (change1 >= 0)
             {
                 gain = gain + change1;
@@ -118,20 +119,24 @@ class RSI : public Strategy
             {
                 loss = loss + change2;
             }
-            upper++;
-            lower++;
         }
+        //cout << date[upper] << "->" << rsi << " " << gain << " " << loss << endl;
+             
+        upper++;
+        lower++;
+    }
+    
+    total_profit = cash_transaction + (position * data.back()[0]);
+    //cout << total_profit << endl;
 
-        total_profit = cash_transaction + (position * close_price.back()[0]);
-        // cout << total_profit << endl;
+    Statistics ans;
+    ans.daily_cashflow = cashflow;
+    ans.final_pnl = total_profit;
+    ans.order_statistics = order_stats;
+    
 
-        Statistics ans;
-        ans.daily_cashflow = cashflow;
-        ans.final_pnl = total_profit;
-        ans.order_statistics = order_stats;
-
-        cout << total_profit << endl;
-        return ans;
+    cout << total_profit << endl;
+    return ans;
     }
 
   public:
