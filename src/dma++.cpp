@@ -74,6 +74,7 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
             ER = ER / absolute_change;
         }
 
+        ////////cout<<ER<<"->"<<date[idx]<<endl;
         double num = double(2 * ER) / double(1 + c2);
         if (idx == n - 1)
         {
@@ -93,8 +94,13 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
             AMA = AMA + (SF * (data[idx][0] - AMA));
         }
         string s = "none";
+        ////cout<<date[idx]<<"->"<<SF<<"->"<<AMA<<endl;
         if (days_monitor.size() > 0)
         {
+            for (int i = 0; i < days_monitor.size(); i++)
+            {
+                ////cout<<days_monitor[i]<<" ";
+            } ////cout<<endl;
             if (days_monitor[0] >= max_hold_days)
             {
 
@@ -104,6 +110,8 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                     cash_transaction = cash_transaction + data[idx][0];
                     days_monitor.erase(days_monitor.begin() + 0);
                     position--;
+                    // cout<<"SELLO"<<endl;
+                    // cout << position << endl;
 
                     vector<string> v = {dates[idx], "SELL", "1", to_string(data[idx][0])};
                     order_stats.push_back(v);
@@ -112,8 +120,11 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                 {
                     s = "buy";
                     cash_transaction = cash_transaction - data[idx][0];
+                    //////cout<<days_monitor.size()<<endl;
                     days_monitor.erase(days_monitor.begin() + 0);
+                    // cout<<"BUYO"<<endl;
                     position++;
+                    // cout << position << endl;
 
                     vector<string> v = {dates[idx], "BUY", "1", to_string(data[idx][0])};
                     order_stats.push_back(v);
@@ -139,6 +150,7 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                             days_monitor.push_back(0);
                         }
                         position++;
+                        /////cout << position << endl;
 
                         vector<string> v = {dates[idx], "BUY", "1", to_string(data[idx][0])};
                         order_stats.push_back(v);
@@ -156,20 +168,11 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                         }
                         order_stats.pop_back();
                         position++;
+                        //////////cout << position << endl;
                     }
                     else if (s == "buy")
                     {
-                        cash_transaction = cash_transaction - data[idx][0];
-                        if (position < 0)
-                        {
-                            days_monitor.erase(days_monitor.begin() + 0);
-                        }
-                        else
-                        {
-                            days_monitor.push_back(0);
-                        }
-                        position++;
-                        order_stats.back()[2] = "2";
+                        ;
                     }
                 }
             }
@@ -189,6 +192,7 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                             days_monitor.push_back(0);
                         }
                         position--;
+                        ////////cout << position << endl;
 
                         vector<string> v = {dates[idx], "SELL", "1", to_string(data[idx][0])};
                         order_stats.push_back(v);
@@ -206,38 +210,246 @@ Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> da
                         }
                         order_stats.pop_back();
                         position--;
+                        //////cout << position << endl;
                     }
                     else if (s == "sell")
                     {
-                        cash_transaction = cash_transaction + data[idx][0];
-                        if (position > 0)
-                        {
-                            days_monitor.erase(days_monitor.begin() + 0);
-                        }
-                        else
-                        {
-                            days_monitor.push_back(0);
-                        }
-                        position--;
-                        order_stats.back()[2] = "2";
+                        ;
                     }
                 }
+                ////cout<<position<<endl;
             }
         }
 
+        cout << dates[idx] << "->" << cash_transaction << endl;
+        // cout<<position<<endl;
         cashflow.push_back(make_pair(dates[idx], cash_transaction));
         idx++;
     }
 
     total_profit = cash_transaction + (position * data.back()[0]);
+    ////////cout << total_profit << endl;
+
+    for (int i = 0; i < order_stats.size(); i++)
+    {
+        cout << order_stats[i][0] << "->" << order_stats[i][1] << "->" << order_stats[i][2] << "->" << order_stats[i][3]
+             << endl;
+    }
 
     Statistics ans;
     ans.daily_cashflow = cashflow;
     ans.final_pnl = total_profit;
     ans.order_statistics = order_stats;
+    cout << total_profit << endl;
 
     return ans;
 }
+// Statistics DMAPlusPlus::get_stats(vector<vector<double>> data, vector<string> dates)
+// {
+//     vector<pair<string, double>> cashflow;
+//     vector<vector<string>> order_stats;
+//     double total_profit = 0;
+//     double cash_transaction = 0;
+//     int position = 0;
+//     vector<int> days_monitor;
+//     int idx = n - 1;
+//     double SF = 0.5;
+//     double AMA = data[idx][0];
+//     while (idx < data.size())
+//     {
+
+//         for (int i = 0; i < days_monitor.size(); i++)
+//         {
+//             days_monitor[i]++;
+//         }
+//         double absolute_change = 0;
+//         for (int i = idx - n + 2; i <= idx; i++)
+//         {
+//             if (data[i][0] - data[i - 1][0] >= 0)
+//             {
+//                 absolute_change += data[i][0] - data[i - 1][0];
+//             }
+//             else
+//             {
+//                 absolute_change += data[i - 1][0] - data[i][0];
+//             }
+//         }
+//         double ER = data[idx][0] - data[idx + 1 - n][0];
+//         bool flag = false;
+
+//         if (absolute_change == 0)
+//         {
+//             flag = true;
+//         }
+//         else
+//         {
+//             ER = ER / absolute_change;
+//         }
+
+//         double num = double(2 * ER) / double(1 + c2);
+//         if (idx == n - 1)
+//         {
+//             SF = 0.5;
+//             AMA = data[idx][0];
+//         }
+//         else
+//         {
+//             if (absolute_change == 0)
+//             {
+//                 SF = SF;
+//             }
+//             else
+//             {
+//                 SF = SF + (c1 * ((double(num - 1) / double(num + 1)) - SF));
+//             }
+//             AMA = AMA + (SF * (data[idx][0] - AMA));
+//         }
+//         string s = "none";
+//         if (days_monitor.size() > 0)
+//         {
+//             if (days_monitor[0] >= max_hold_days)
+//             {
+
+//                 if (position > 0)
+//                 {
+//                     s = "sell";
+//                     cash_transaction = cash_transaction + data[idx][0];
+//                     days_monitor.erase(days_monitor.begin() + 0);
+//                     position--;
+
+//                     vector<string> v = {dates[idx], "SELL", "1", to_string(data[idx][0])};
+//                     order_stats.push_back(v);
+//                 }
+//                 else
+//                 {
+//                     s = "buy";
+//                     cash_transaction = cash_transaction - data[idx][0];
+//                     days_monitor.erase(days_monitor.begin() + 0);
+//                     position++;
+
+//                     vector<string> v = {dates[idx], "BUY", "1", to_string(data[idx][0])};
+//                     order_stats.push_back(v);
+//                 }
+//             }
+//         }
+
+//         if (absolute_change != 0)
+//         {
+//             if (data[idx][0] > AMA + ((AMA * p) / double(100)))
+//             {
+//                 if (position < x)
+//                 {
+//                     if (s == "none")
+//                     {
+//                         cash_transaction = cash_transaction - data[idx][0];
+//                         if (position < 0)
+//                         {
+//                             days_monitor.erase(days_monitor.begin() + 0);
+//                         }
+//                         else
+//                         {
+//                             days_monitor.push_back(0);
+//                         }
+//                         position++;
+
+//                         vector<string> v = {dates[idx], "BUY", "1", to_string(data[idx][0])};
+//                         order_stats.push_back(v);
+//                     }
+//                     else if (s == "sell")
+//                     {
+//                         cash_transaction = cash_transaction - data[idx][0];
+//                         if (position < 0)
+//                         {
+//                             days_monitor.erase(days_monitor.begin() + 0);
+//                         }
+//                         else
+//                         {
+//                             days_monitor.push_back(0);
+//                         }
+//                         order_stats.pop_back();
+//                         position++;
+//                     }
+//                     else if (s == "buy")
+//                     {
+//                         cash_transaction = cash_transaction - data[idx][0];
+//                         if (position < 0)
+//                         {
+//                             days_monitor.erase(days_monitor.begin() + 0);
+//                         }
+//                         else
+//                         {
+//                             days_monitor.push_back(0);
+//                         }
+//                         position++;
+//                         order_stats.back()[2] = "2";
+//                     }
+//                 }
+//             }
+//             else if (data[idx][0] < AMA - ((AMA * p) / double(100)))
+//             {
+//                 if (position > -x)
+//                 {
+//                     if (s == "none")
+//                     {
+//                         cash_transaction = cash_transaction + data[idx][0];
+//                         if (position > 0)
+//                         {
+//                             days_monitor.erase(days_monitor.begin() + 0);
+//                         }
+//                         else
+//                         {
+//                             days_monitor.push_back(0);
+//                         }
+//                         position--;
+
+//                         vector<string> v = {dates[idx], "SELL", "1", to_string(data[idx][0])};
+//                         order_stats.push_back(v);
+//                     }
+//                     else if (s == "buy")
+//                     {
+//                         cash_transaction = cash_transaction + data[idx][0];
+//                         if (position > 0)
+//                         {
+//                             days_monitor.erase(days_monitor.begin() + 0);
+//                         }
+//                         else
+//                         {
+//                             days_monitor.push_back(0);
+//                         }
+//                         order_stats.pop_back();
+//                         position--;
+//                     }
+//                     else if (s == "sell")
+//                     {
+//                         cash_transaction = cash_transaction + data[idx][0];
+//                         if (position > 0)
+//                         {
+//                             days_monitor.erase(days_monitor.begin() + 0);
+//                         }
+//                         else
+//                         {
+//                             days_monitor.push_back(0);
+//                         }
+//                         position--;
+//                         order_stats.back()[2] = "2";
+//                     }
+//                 }
+//             }
+//         }
+
+//         cashflow.push_back(make_pair(dates[idx], cash_transaction));
+//         idx++;
+//     }
+
+//     total_profit = cash_transaction + (position * data.back()[0]);
+
+//     Statistics ans;
+//     ans.daily_cashflow = cashflow;
+//     ans.final_pnl = total_profit;
+//     ans.order_statistics = order_stats;
+
+//     return ans;
+// }
 
 DMAPlusPlus::DMAPlusPlus(std::vector<std::string> args)
 {
